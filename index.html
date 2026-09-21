@@ -254,7 +254,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 10px;
-      max-height: 220px;
+      max-height: 240px;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -357,53 +357,74 @@
 </div>
 
 <script>
-  // 이미지 기반 대폭 확장된 식품군 DB (1회 기준 중량 설정)
+  // 이미지 표 기준 곡류 30종 확장 및 전체 식품군 DB (1회 기준 중량 설정)
   const foodDatabase = [
-    // 곡류
-    { id: 1, category: '곡류', name: '백미', weight: 90 },
-    { id: 2, category: '곡류', name: '현미밥', weight: 90 },
-    { id: 3, category: '곡류', name: '잡곡밥', weight: 90 },
-    { id: 4, category: '곡류', name: '라면사리', weight: 120 },
-    { id: 5, category: '곡류', name: '떡사리', weight: 80 },
-    { id: 6, category: '곡류', name: '당면', weight: 60 },
-    { id: 7, category: '곡류', name: '국수사리', weight: 100 },
-    { id: 8, category: '곡류', name: '식빵', weight: 80 },
-    { id: 9, category: '곡류', name: '고구마', weight: 100 },
-    
+    // 곡류 (첨부 이미지 '곡류 1인 1회 분량' 30종 반영)
+    { id: 1, category: '곡류', name: '쌀밥', weight: 210 },
+    { id: 2, category: '곡류', name: '백미', weight: 90 },
+    { id: 3, category: '곡류', name: '보리', weight: 90 },
+    { id: 4, category: '곡류', name: '찹쌀', weight: 90 },
+    { id: 5, category: '곡류', name: '현미', weight: 90 },
+    { id: 6, category: '곡류', name: '조', weight: 90 },
+    { id: 7, category: '곡류', name: '수수', weight: 90 },
+    { id: 8, category: '곡류', name: '기장', weight: 90 },
+    { id: 9, category: '곡류', name: '팥', weight: 90 },
+    { id: 10, category: '곡류', name: '귀리', weight: 90 },
+    { id: 11, category: '곡류', name: '율무', weight: 90 },
+    { id: 12, category: '곡류', name: '옥수수', weight: 70 },
+    { id: 13, category: '곡류', name: '국수 말린 것', weight: 90 },
+    { id: 14, category: '곡류', name: '메밀국수 말린 것', weight: 90 },
+    { id: 15, category: '곡류', name: '냉면국수 말린 것', weight: 90 },
+    { id: 16, category: '곡류', name: '우동 생면', weight: 200 },
+    { id: 17, category: '곡류', name: '칼국수 생면', weight: 200 },
+    { id: 18, category: '곡류', name: '당면', weight: 30 },
+    { id: 19, category: '곡류', name: '라면사리', weight: 120 },
+    { id: 20, category: '곡류', name: '가래떡', weight: 150 },
+    { id: 21, category: '곡류', name: '백설기', weight: 150 },
+    { id: 22, category: '곡류', name: '식빵', weight: 35 },
+    { id: 23, category: '곡류', name: '시리얼', weight: 30 },
+    { id: 24, category: '곡류', name: '감자', weight: 140 },
+    { id: 25, category: '곡류', name: '고구마', weight: 70 },
+    { id: 26, category: '곡류', name: '묵', weight: 200 },
+    { id: 27, category: '곡류', name: '밤', weight: 60 },
+    { id: 28, category: '곡류', name: '밀가루', weight: 30 },
+    { id: 29, category: '곡류', name: '과자 스낵', weight: 30 },
+    { id: 30, category: '곡류', name: '과자 비스킷/쿠키', weight: 30 },
+
     // 고기·생선·달걀·콩류 (단백질)
-    { id: 10, category: '단백질', name: '소시지', weight: 30 },
-    { id: 11, category: '단백질', name: '두부', weight: 80 },
-    { id: 12, category: '단백질', name: '돼지고기', weight: 60 },
-    { id: 13, category: '단백질', name: '닭고기', weight: 60 },
-    { id: 14, category: '단백질', name: '쇠고기', weight: 60 },
-    { id: 15, category: '단백질', name: '달걀', weight: 50 },
-    { id: 16, category: '단백질', name: '고등어', weight: 50 },
-    { id: 17, category: '단백질', name: '오징어', weight: 50 },
-    { id: 18, category: '단백질', name: '햄', weight: 30 },
-    { id: 19, category: '단백질', name: '어묵', weight: 40 },
-    { id: 20, category: '단백질', name: '돈가스', weight: 80 },
-    
+    { id: 31, category: '단백질', name: '소시지', weight: 30 },
+    { id: 32, category: '단백질', name: '두부', weight: 80 },
+    { id: 33, category: '단백질', name: '돼지고기', weight: 60 },
+    { id: 34, category: '단백질', name: '닭고기', weight: 60 },
+    { id: 35, category: '단백질', name: '쇠고기', weight: 60 },
+    { id: 36, category: '단백질', name: '달걀', weight: 50 },
+    { id: 37, category: '단백질', name: '고등어', weight: 50 },
+    { id: 38, category: '단백질', name: '오징어', weight: 50 },
+    { id: 39, category: '단백질', name: '햄', weight: 30 },
+    { id: 40, category: '단백질', name: '어묵', weight: 40 },
+    { id: 41, category: '단백질', name: '돈가스', weight: 80 },
+
     // 채소류
-    { id: 21, category: '채소류', name: '배추김치', weight: 40 },
-    { id: 22, category: '채소류', name: '깍두기', weight: 40 },
-    { id: 23, category: '채소류', name: '콩나물', weight: 50 },
-    { id: 24, category: '채소류', name: '시금치', weight: 70 },
-    { id: 25, category: '채소류', name: '양파', weight: 40 },
-    { id: 26, category: '채소류', name: '무', weight: 50 },
-    { id: 27, category: '채소류', name: '상추/쌈채소', weight: 30 },
-    { id: 28, category: '채소류', name: '오이', weight: 40 },
-    { id: 29, category: '채소류', name: '브로콜리', weight: 50 },
-    { id: 30, category: '채소류', name: '버섯', weight: 50 },
+    { id: 42, category: '채소류', name: '배추김치', weight: 40 },
+    { id: 43, category: '채소류', name: '깍두기', weight: 40 },
+    { id: 44, category: '채소류', name: '콩나물', weight: 50 },
+    { id: 45, category: '채소류', name: '시금치', weight: 70 },
+    { id: 46, category: '채소류', name: '양파', weight: 40 },
+    { id: 47, category: '채소류', name: '무', weight: 50 },
+    { id: 48, category: '채소류', name: '상추/쌈채소', weight: 30 },
+    { id: 49, category: '채소류', name: '오이', weight: 40 },
+    { id: 50, category: '채소류', name: '브로콜리', weight: 50 },
+    { id: 51, category: '채소류', name: '버섯', weight: 50 },
 
     // 과일 / 유제품 (후식)
-    { id: 31, category: '후식', name: '사과', weight: 100 },
-    { id: 32, category: '후식', name: '바나나', weight: 100 },
-    { id: 33, category: '후식', name: '귤', weight: 100 },
-    { id: 34, category: '후식', name: '방울토마토', weight: 80 },
-    { id: 35, category: '후식', name: '포도', weight: 100 },
-    { id: 36, category: '후식', name: '우유', weight: 200 },
-    { id: 37, category: '후식', name: '요구르트', weight: 100 },
-    { id: 38, category: '후식', name: '치즈', weight: 20 }
+    { id: 52, category: '후식', name: '사과', weight: 100 },
+    { id: 53, category: '후식', name: '바나나', weight: 100 },
+    { id: 54, category: '후식', name: '귤', weight: 100 },
+    { id: 55, category: '후식', name: '방울토마토', weight: 80 },
+    { id: 56, category: '후식', name: '포도', weight: 100 },
+    { id: 57, category: '후식', name: '우유', weight: 200 },
+    { id: 58, category: '후식', name: '요구르트', weight: 100 },
+    { id: 59, category: '후식', name: '치즈', weight: 20 }
   ];
 
   // 이미지 기준 기본 식판 6칸 상태 및 초기 데이터
@@ -412,20 +433,20 @@
     { defaultLabel: '부반찬 1 (채소류)', menuName: '', ingredients: [] },
     { defaultLabel: '부반찬 2 (채소류)', menuName: '', ingredients: [] },
     { defaultLabel: '후식 (과일/유제품)', menuName: '', ingredients: [] },
-    { defaultLabel: '밥 (곡류)', menuName: '백미밥', ingredients: [
-        { foodId: 1, name: '백미', category: '곡류', serving: 1.0, weight: 90, baseWeight: 90 }
+    { defaultLabel: '밥 (곡류)', menuName: '쌀밥', ingredients: [
+        { foodId: 1, name: '쌀밥', category: '곡류', serving: 1.0, weight: 210, baseWeight: 210 }
       ]
     },
     { defaultLabel: '국 / 메인', menuName: '부대찌개', ingredients: [
-        { foodId: 10, name: '소시지', category: '단백질', serving: 0.5, weight: 15, baseWeight: 30 },
-        { foodId: 11, name: '두부', category: '단백질', serving: 0.5, weight: 40, baseWeight: 80 },
-        { foodId: 21, name: '배추김치', category: '채소류', serving: 0.5, weight: 20, baseWeight: 40 },
-        { foodId: 4, name: '라면사리', category: '곡류', serving: 0.5, weight: 60, baseWeight: 120 }
+        { foodId: 31, name: '소시지', category: '단백질', serving: 0.5, weight: 15, baseWeight: 30 },
+        { foodId: 32, name: '두부', category: '단백질', serving: 0.5, weight: 40, baseWeight: 80 },
+        { foodId: 42, name: '배추김치', category: '채소류', serving: 0.5, weight: 20, baseWeight: 40 },
+        { foodId: 19, name: '라면사리', category: '곡류', serving: 0.5, weight: 60, baseWeight: 120 }
       ]
     }
   ];
 
-  let activeSlotIndex = 5; // 기본 선택: 국/메인 칸
+  let activeSlotIndex = 4; // 기본 선택: 밥 칸
   let currentServing = 1.0; // 기본 선택 분량 (1회)
   let currentCategory = '전체';
 
@@ -620,7 +641,7 @@
     });
 
     const targets = {
-      '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면)' },
+      '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면/떡)' },
       '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류' },
       '채소류': { min: 1.5, max: 2.5, label: '채소류 (반찬/국)' },
       '후식': { min: 0.5, max: 1.0, label: '과일 / 유제품' }
