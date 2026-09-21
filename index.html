@@ -205,10 +205,11 @@
 
     .placed-food-name {
       font-family: 'Jua', sans-serif;
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: #263238;
       margin-top: 5px;
       word-break: keep-all;
+      line-height: 1.2;
     }
 
     .remove-btn {
@@ -267,9 +268,9 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      max-height: 180px;
+      max-height: 200px;
       overflow-y: auto;
-      padding: 8px;
+      padding: 10px;
       background: #f9fbe7;
       border-radius: 15px;
       border: 1px solid #f0f4c3;
@@ -281,9 +282,10 @@
       border: 1.5px solid #dce775;
       padding: 6px 12px;
       border-radius: 15px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.15s;
+      word-break: keep-all;
     }
 
     .food-chip:active {
@@ -432,28 +434,59 @@
 </div>
 
 <script>
-  // 1. PDF 기반 식품군 데이터베이스
+  // 1. PDF 및 보건복지부 1인 1회 분량 기준 데이터베이스
   const foodDatabase = [
-    { name: "쌀밥", category: "곡류" }, { name: "현미밥", category: "곡류" },
-    { name: "가래떡", category: "곡류" }, { name: "식빵", category: "곡류" },
-    { name: "국수", category: "곡류" }, { name: "고구마", category: "곡류" },
-    { name: "감자", category: "곡류" }, { name: "시리얼", category: "곡류" },
+    // 곡류 (첨부 이미지 기준 30개 항목 정밀 교체)
+    { name: "쌀밥(210g)", category: "곡류" },
+    { name: "백미(90g)", category: "곡류" },
+    { name: "보리(90g)", category: "곡류" },
+    { name: "찹쌀(90g)", category: "곡류" },
+    { name: "현미(90g)", category: "곡류" },
+    { name: "조(90g)", category: "곡류" },
+    { name: "수수(90g)", category: "곡류" },
+    { name: "기장(90g)", category: "곡류" },
+    { name: "팥(90g)", category: "곡류" },
+    { name: "귀리(90g)", category: "곡류" },
+    { name: "율무(90g)", category: "곡류" },
+    { name: "옥수수(70g)", category: "곡류" },
+    { name: "국수 말린 것(90g)", category: "곡류" },
+    { name: "메밀국수 말린 것(90g)", category: "곡류" },
+    { name: "냉면국수 말린 것(90g)", category: "곡류" },
+    { name: "우동 생면(200g)", category: "곡류" },
+    { name: "칼국수 생면(200g)", category: "곡류" },
+    { name: "당면(30g)", category: "곡류" },
+    { name: "라면사리(120g)", category: "곡류" },
+    { name: "가래떡(150g)", category: "곡류" },
+    { name: "백설기(150g)", category: "곡류" },
+    { name: "식빵(35g)", category: "곡류" },
+    { name: "시리얼(30g)", category: "곡류" },
+    { name: "감자(140g)", category: "곡류" },
+    { name: "고구마(70g)", category: "곡류" },
+    { name: "묵(200g)", category: "곡류" },
+    { name: "밤(60g)", category: "곡류" },
+    { name: "밀가루(30g)", category: "곡류" },
+    { name: "과자 스낵(30g)", category: "곡류" },
+    { name: "과자 비스킷/쿠키(30g)", category: "곡류" },
 
+    // 고기·생선·달걀·콩류 (단백질)
     { name: "돼지고기볶음", category: "단백질" }, { name: "쇠고기구이", category: "단백질" },
     { name: "닭갈비", category: "단백질" }, { name: "고등어조림", category: "단백질" },
     { name: "달걀말이", category: "단백질" }, { name: "두부조림", category: "단백질" },
     { name: "오징어볶음", category: "단백질" }, { name: "어묵볶음", category: "단백질" },
 
+    // 채소류
     { name: "배추김치", category: "채소류" }, { name: "콩나물무침", category: "채소류" },
     { name: "시금치나물", category: "채소류" }, { name: "오이소박이", category: "채소류" },
     { name: "깍두기", category: "채소류" }, { name: "브로콜리", category: "채소류" },
     { name: "상추쌈", category: "채소류" }, { name: "느타리버섯볶음", category: "채소류" },
 
+    // 과일류
     { name: "사과", category: "과일류" }, { name: "귤", category: "과일류" },
     { name: "수박", category: "과일류" }, { name: "참외", category: "과일류" },
     { name: "포도", category: "과일류" }, { name: "바나나", category: "과일류" },
     { name: "샤인머스캣", category: "과일류" },
 
+    // 우유·유제품류
     { name: "우유", category: "유제품" }, { name: "슬라이스치즈", category: "유제품" },
     { name: "요거트", category: "유제품" }, { name: "아이스크림", category: "유제품" }
   ];
@@ -534,7 +567,7 @@
 
     // 밥 칸 규칙 검증 (곡류만 허용)
     if (currentSelectedSlot.dataset.slotId === 'rice' && foodItem.category !== '곡류') {
-      alert("⚠️ 밥 칸에는 우리 몸의 에너지원이 되는 '곡류'(쌀밥, 현미밥, 식빵 등)를 담아주세요!");
+      alert("⚠️ 밥 칸에는 우리 몸의 중요한 에너지원이 되는 '곡류'(쌀밥, 현미밥, 식빵 등)를 담아주세요!");
       return;
     }
 
@@ -557,11 +590,11 @@
       return;
     }
 
-    const foodName = prompt("음식 이름을 입력해 주세요 (예: 마라탕):");
+    const foodName = prompt("음식 이름을 입력해 주세요 (예: 감자(140g)):");
     if (!foodName) return;
 
-    const catInput = prompt("어떤 식품군인가요?\n(곡류 / 단백질 / 채소류 / 과일류 / 유제품 중에서 입력)", "채소류");
-    let category = "채소류";
+    const catInput = prompt("어떤 식품군인가요?\n(곡류 / 단백질 / 채소류 / 과일류 / 유제품 중에서 입력)", "곡류");
+    let category = "곡류";
     if (["곡류", "단백질", "채소류", "과일류", "유제품"].includes(catInput)) {
       category = catInput;
     }
@@ -652,7 +685,7 @@
 
     // 규칙 4: 채소류 2개 이상 필수 검사
     if (counts.채소류 < 2) {
-      alert("⚠️ 비타민과 식이섬유가 부족해요!\n몸속 차전을 힘차게 돌리려면 🥦 채소류 반찬(김치, 나물, 샐러드 등)을 최소 2가지 이상 챙겨야 해요.");
+      alert("⚠️ 비타민과 식이섬유가 부족해요!\n몸속 자전거를 힘차게 돌리려면 🥦 채소류 반찬(김치, 나물, 샐러드 등)을 최소 2가지 이상 챙겨야 해요.");
       return false;
     }
 
