@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>뇸뇸! 영양 균형 식판 만들기 🍱</title>
+  
+  <!-- 웹 폰트 로드: Jua(제목/버튼용), Gowun Dodum(본문/안내문용) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+  
+  <!-- html2canvas 라이브러리 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    /* 1. 글로벌 스타일 & 5학년 맞춤 폰트/배경 */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #e8f5e9 100%);
+      --primary-color: #ff7043;
+      --accent-color: #4caf50;
+      /* 식품구성자전거 상징 색상 */
+      --color-grain: #fbc02d;      /* 곡류: 노랑 */
+      --color-protein: #ba68c8;    /* 고기·생선: 보라 */
+      --color-veggie: #66bb6a;     /* 채소류: 초록 */
+      --color-fruit: #ef5350;      /* 과일류: 빨강/분홍 */
+      --color-milk: #29b6f6;       /* 우유·유제품: 하늘 */
+      --color-fat: #ffa726;        /* 유지·당류: 주황 */
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Gowun Dodum', sans-serif;
+      background: var(--bg-gradient);
+      margin: 0;
+      padding: 20px 10px;
+      min-height: 100vh;
+      color: #37474f;
+    }
+
+    h1, h2, h3, button, .badge {
+      font-family: 'Jua', sans-serif;
+    }
+
+    .container {
+      max-width: 768px;
+      margin: 0 auto;
+    }
+
+    /* 2. 상단 헤더 & 타이틀 디자인 */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--primary-color);
+      margin: 5px 0;
+      text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.05);
+    }
+
+    p.subtitle {
+      font-size: 1.05rem;
+      color: #546e7a;
+      margin: 0;
+    }
+
+    /* 3. 학생 정보 입력 카드 */
+    .student-card {
+      background: #ffffff;
+      padding: 15px 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .student-card input {
+      font-family: 'Jua', sans-serif;
+      font-size: 1.1rem;
+      border: 2px solid #ffe0b2;
+      border-radius: 12px;
+      padding: 6px 12px;
+      text-align: center;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .student-card input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(255,112,67,0.2);
+    }
+
+    /* 4. 스테인리스 식판 스타일 (입체감 강조) */
+    .plate-wrapper {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+    }
+
+    #plate-area {
+      background: linear-gradient(145deg, #e6ecf2, #cfd8dc);
+      border: 10px solid #b0bec5;
+      border-radius: 40px;
+      padding: 25px 20px;
+      box-shadow: inset 0 5px 15px rgba(0,0,0,0.15), 0 8px 0 #90a4ae;
+      position: relative;
+    }
+
+    .plate-title-display {
+      text-align: center;
+      font-family: 'Jua', sans-serif;
+      font-size: 1.3rem;
+      color: #37474f;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.7);
+      padding: 5px 15px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .plate-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 12px;
+    }
+
+    /* 식판 개별 칸 스타일 */
+    .slot {
+      background: #ffffff;
+      border: 3px dashed #b0bec5;
+      border-radius: 25px;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
+      position: relative;
+      padding: 8px;
+    }
+
+    .slot:hover, .slot.active {
+      border-color: var(--primary-color);
+      background: #fff8e1;
+      transform: translateY(-3px);
+    }
+
+    /* 아래쪽 큰 밥/국 칸 */
+    .slot.main-rice {
+      grid-column: span 2;
+      height: 140px;
+      border-radius: 35px;
+    }
+
+    .slot.main-soup {
+      grid-column: span 2;
+      height: 140px;
+      border-radius: 35px;
+    }
+
+    .slot-label {
+      font-size: 0.85rem;
+      color: #90a4ae;
+      margin-top: 4px;
+    }
+
+    /* 5. 식품군 카탈로그 & 버튼 패널 */
+    .menu-panel {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      background: #f1f8e9;
+      color: #33691e;
+      font-size: 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-color);
+      color: white;
+      box-shadow: 0 4px 10px rgba(76,175,80,0.3);
+    }
+
+    /* 식품 뱃지 태그 */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .badge-grain { background-color: var(--color-grain); }
+    .badge-protein { background-color: var(--color-protein); }
+    .badge-veggie { background-color: var(--color-veggie); }
+    .badge-fruit { background-color: var(--color-fruit); }
+    .badge-milk { background-color: var(--color-milk); }
+
+    /* 저장 및 제출 버튼 */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.3rem;
+      color: white;
+      background: linear-gradient(45deg, #ff7043, #ffa726);
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(255,112,67,0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 15px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255,112,67,0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* 모바일 스크린 대응 */
+    @media (max-width: 600px) {
+      .plate-grid { grid-template-columns: repeat(2, 1fr); }
+      .slot.main-rice, .slot.main-soup { grid-column: span 2; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 1. 헤더 -->
+  <header>
+    <h1>🍱 영양 만점! 내 마음대로 식판 만들기</h1>
+    <p class="subtitle">식품구성자전거 규칙에 맞춰 건강한 점심 식단을 완성해 보세요!</p>
+  </header>
+
+  <!-- 2. 학생 학년/반/이름 입력 -->
+  <div class="student-card">
+    <label>🎓 </label>
+    <input type="number" id="grade" value="5" style="width: 60px;"> 학년
+    <input type="number" id="classNum" placeholder="반" style="width: 60px;"> 반
+    <input type="text" id="studentName" placeholder="이름 입력" style="width: 120px;">
+  </div>
+
+  <!-- 3. 식판 영역 (이미지 저장 대상) -->
+  <div class="plate-wrapper">
+    <div id="plate-area">
+      <div style="text-align: center;">
+        <span class="plate-title-display" id="infoDisplay">5학년 O반 OOO의 건강 식판</span>
+      </div>
+      
+      <div class="plate-grid">
+        <!-- 상단 4개 반찬/후식 칸 -->
+        <div class="slot" data-slot="side1" onclick="selectSlot(this)">
+          <span class="badge badge-protein">고기·생선·콩</span>
+          <span class="slot-label">주반찬 칸</span>
+        </div>
+        <div class="slot" data-slot="side2" onclick="selectSlot(this)">
+          <span class="badge badge-veggie">채소류</span>
+          <span class="slot-label">부반찬 1</span>
+        </div>
+        <div class="slot" data-slot="side3" onclick="selectSlot(this)">
+          <span class="badge badge-veggie">채소류</span>
+          <span class="slot-label">부반찬 2</span>
+        </div>
+        <div class="slot" data-slot="dessert" onclick="selectSlot(this)">
+          <span class="badge badge-fruit">과일/유제품</span>
+          <span class="slot-label">후식 칸</span>
+        </div>
+
+        <!-- 하단 2개 밥/국 칸 -->
+        <div class="slot main-rice" data-slot="rice" onclick="selectSlot(this)">
+          <span class="badge badge-grain">곡류</span>
+          <span class="slot-label">밥 (필수)</span>
+        </div>
+        <div class="slot main-soup" data-slot="soup" onclick="selectSlot(this)">
+          <span class="badge badge-veggie">채소/단백질</span>
+          <span class="slot-label">국 / 찌개</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 메뉴 선택 및 입력 패널 -->
+  <div class="menu-panel">
+    <h3>🥗 음식 가져오기</h3>
+    <div class="category-tabs">
+      <button class="tab-btn active">전체</button>
+      <button class="tab-btn">🌾 곡류</button>
+      <button class="tab-btn">🥩 고기·생선·콩</button>
+      <button class="tab-btn">🥦 채소류</button>
+      <button class="tab-btn">🍎 과일류</button>
+      <button class="tab-btn">🥛 우유·유제품</button>
+    </div>
+
+    <!-- 직접 입력 기능 버튼 -->
+    <button onclick="addCustomFood()" style="background:#fff3e0; border:2px dashed #ffb74d; padding:10px; width:100%; border-radius:12px; font-family:'Jua'; cursor:pointer;">
+      ➕ 원하는 음식이 없나요? (음식 이름 직접 입력하기)
+    </button>
+  </div>
+
+  <!-- 5. 최종 완성 버튼 -->
+  <button class="submit-btn" onclick="savePlateImage()">
+    📸 완성된 식판 이미지로 저장하기
+  </button>
+</div>
+
+<script>
+  // 학생 정보 동적 업데이트
+  document.querySelectorAll('.student-card input').forEach(input => {
+    input.addEventListener('input', () => {
+      const g = document.getElementById('grade').value || '5';
+      const c = document.getElementById('classNum').value || 'O';
+      const n = document.getElementById('studentName').value || 'OOO';
+      document.getElementById('infoDisplay').innerText = `${g}학년 ${c}반 ${n}의 건강 식판`;
+    });
+  });
+
+  function selectSlot(element) {
+    document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  function addCustomFood() {
+    const foodName = prompt("음식 이름을 입력하세요 (예: 샤인머스캣):");
+    if (!foodName) return;
+    alert(`'${foodName}'이(가) 선택된 식판 칸에 담겼습니다!`);
+  }
+
+  function savePlateImage() {
+    const name = document.getElementById('studentName').value;
+    if (!name) {
+      alert("이름을 꼭 입력해 주세요!");
+      return;
+    }
+
+    html2canvas(document.getElementById('plate-area'), { scale: 2 }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `5학년_${document.getElementById('classNum').value}반_${name}_식판.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
+</script>
+
+</body>
+</html>
