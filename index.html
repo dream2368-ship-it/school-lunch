@@ -20,7 +20,7 @@
       position: relative;
     }
 
-    /* 상단 타이틀 (균형잡힌 식단 만들기) */
+    /* 상단 타이틀 */
     .tray-header {
       background: #ffffff;
       border-radius: 20px;
@@ -83,7 +83,6 @@
       min-height: 160px;
     }
 
-    /* 상단 메뉴명 직접 입력 input */
     .menu-name-input {
       border: none;
       border-bottom: 1.5px dashed #cbd5e1;
@@ -261,6 +260,7 @@
     .food-item-btn .name { font-weight: 700; font-size: 0.85rem; color: #1e293b; }
     .food-item-btn .weight { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
 
+    /* 실시간 영양 균형 대시보드 및 색상 스타일 정의 */
     .nutrition-section {
       background-color: #f8fafc;
       border-radius: 16px;
@@ -272,26 +272,32 @@
 
     .nutrition-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 10px;
     }
 
     .nut-card {
       background-color: #ffffff;
       border-radius: 12px;
-      padding: 10px 14px;
-      border-left: 4px solid #cbd5e1;
+      padding: 12px 14px;
+      border-left: 5px solid #cbd5e1;
       box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      transition: all 0.2s;
     }
 
-    .nut-card.ok { border-left-color: #22c55e; }
-    .nut-card.warn { border-left-color: #f59e0b; }
+    /* 부족 (노랑색) */
+    .nut-card.warn { border-left-color: #eab308; background-color: #fefce8; }
+    /* 적정 (초록색) */
+    .nut-card.ok { border-left-color: #22c55e; background-color: #f0fdf4; }
+    /* 초과 (빨강색) */
+    .nut-card.over { border-left-color: #ef4444; background-color: #fef2f2; }
 
     .nut-card-name { font-size: 0.75rem; font-weight: 700; color: #64748b; }
-    .nut-card-val { font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 2px 0; }
-    .nut-card-status { font-size: 0.7rem; font-weight: 700; }
+    .nut-card-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 3px 0; }
+    .nut-card-status { font-size: 0.73rem; font-weight: 700; }
+    .nut-card-status.warn { color: #ca8a04; }
     .nut-card-status.ok { color: #16a34a; }
-    .nut-card-status.warn { color: #d97706; }
+    .nut-card-status.over { color: #dc2626; }
   </style>
 </head>
 <body>
@@ -299,7 +305,6 @@
 <div class="app-container">
   <!-- 식판 영역 -->
   <div class="tray-frame">
-    <!-- 타이틀: 균형잡힌 식단 만들기 -->
     <div class="tray-header">
       🍱 균형잡힌 식단 만들기 
       (<input type="number" id="gradeInput" class="header-input" value="5" min="1" max="6">학년 
@@ -317,7 +322,6 @@
         👉 식재료를 넣을 식판 칸을 선택해 주세요.
       </div>
 
-      <!-- 1회 / 1/2회 분량 선택 스위치 -->
       <div class="serving-selector">
         <span>담기 분량:</span>
         <button class="serving-btn active" id="btnServing1" onclick="setServing(1.0)">1회 분량</button>
@@ -325,13 +329,10 @@
       </div>
     </div>
 
-    <!-- 식재료 카테고리 탭 -->
     <div class="category-tabs" id="categoryTabs"></div>
-
-    <!-- 식재료 버튼 리스트 -->
     <div class="food-grid" id="foodGrid"></div>
 
-    <!-- 실시간 영양 균형 대시보드 -->
+    <!-- 실시간 영양 균형 체크리스트 -->
     <div class="nutrition-section">
       <div class="nutrition-title">📊 전체 식판 영양 균형 체크리스트 (통합 회수 집계)</div>
       <div class="nutrition-grid" id="nutritionGrid"></div>
@@ -340,7 +341,6 @@
 </div>
 
 <script>
-  // 첨부 파일 기준 전체 식품 157종 DB (g / mL 단위 명시)
   const foodDatabase = [
     // 1. 곡류 (300 kcal)
     { id: 1, category: '곡류', name: '쌀밥', weight: 210, unit: 'g' },
@@ -508,9 +508,8 @@
     { id: 157, category: '후식', name: '치즈', weight: 20, unit: 'g' }
   ];
 
-  // 식판 6칸 기본 구성
   let slots = [
-    { defaultLabel: '주반찬 (고기·생선·달걀·콩)', menuName: '', ingredients: [] },
+    { defaultLabel: '주반찬 (단백질)', menuName: '', ingredients: [] },
     { defaultLabel: '부반찬 1 (채소류)', menuName: '', ingredients: [] },
     { defaultLabel: '부반찬 2 (채소류)', menuName: '', ingredients: [] },
     { defaultLabel: '후식 (과일/유제품)', menuName: '', ingredients: [] },
@@ -700,6 +699,7 @@
     });
   }
 
+  /* 업데이트된 영양 균형 집계 및 3색 상태 평가 로직 */
   function renderNutritionDashboard() {
     const totals = { '곡류': 0, '단백질': 0, '채소류': 0, '후식': 0 };
 
@@ -711,11 +711,12 @@
       });
     });
 
+    // 설정된 목표 권장 기준
     const targets = {
       '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면/떡)' },
-      '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류' },
-      '채소류': { min: 1.5, max: 2.5, label: '채소류 (반찬/국)' },
-      '후식': { min: 0.5, max: 1.0, label: '과일 / 유제품' }
+      '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류 (단백질)' },
+      '채소류': { min: 2.0, max: 3.0, label: '채소류 (반찬/국)' },
+      '후식': { min: 1.0, max: 1.0, label: '과일 / 유제품' }
     };
 
     const container = document.getElementById('nutritionGrid');
@@ -726,24 +727,27 @@
       const target = targets[key];
       
       let statusText = '';
-      let isOk = false;
+      let statusClass = ''; // 'warn' (노랑), 'ok' (초록), 'over' (빨강)
+
+      const targetRangeText = (target.min === target.max) ? `${target.min}회` : `${target.min}~${target.max}회`;
 
       if (val < target.min) {
-        statusText = `⚠️ 부족 (${target.min}회 이상 권장)`;
+        statusText = `⚠️ 부족 (${targetRangeText} 권장)`;
+        statusClass = 'warn'; // 노랑색
       } else if (val > target.max) {
-        statusText = `⚡ 충분/초과 (${val}회 담김)`;
-        isOk = true;
+        statusText = `⚡ 초과 (${targetRangeText} 권장)`;
+        statusClass = 'over'; // 빨강색
       } else {
-        statusText = `✅ 권장량 충족 (${val}회)`;
-        isOk = true;
+        statusText = `✅ 적정 (${val}회)`;
+        statusClass = 'ok'; // 초록색
       }
 
       const card = document.createElement('div');
-      card.className = `nut-card ${isOk ? 'ok' : 'warn'}`;
+      card.className = `nut-card ${statusClass}`;
       card.innerHTML = `
         <div class="nut-card-name">${target.label}</div>
         <div class="nut-card-val">${val}회</div>
-        <div class="nut-card-status ${isOk ? 'ok' : 'warn'}">${statusText}</div>
+        <div class="nut-card-status ${statusClass}">${statusText}</div>
       `;
       container.appendChild(card);
     });
