@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>5학년 식판 식단 작성기</title>
+  <title>균형잡힌 식단 만들기</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
     body { background-color: #f1f5f9; color: #334155; padding: 24px 16px; display: flex; justify-content: center; min-height: 100vh; }
     
     .app-container { max-width: 960px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
     
-    /* 식판 베이스 프레임 디자인 */
+    /* 식판 베이스 프레임 */
     .tray-frame {
       background-color: #cbd5e1;
       border: 4px solid #94a3b8;
@@ -20,20 +20,20 @@
       position: relative;
     }
 
-    /* 학년 / 반 / 이름 직접 수정 가능한 상단 헤더 */
+    /* 상단 타이틀 (균형잡힌 식단 만들기) */
     .tray-header {
       background: #ffffff;
       border-radius: 20px;
-      padding: 10px 28px;
+      padding: 12px 28px;
       width: fit-content;
       margin: 0 auto 24px auto;
       font-weight: 800;
-      font-size: 1.25rem;
-      color: #1e293b;
+      font-size: 1.35rem;
+      color: #0f172a;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .header-input {
@@ -45,25 +45,13 @@
       color: #0f172a;
       text-align: center;
       outline: none;
-      width: 40px;
+      width: 36px;
       transition: border-color 0.2s;
     }
-    .header-input.name-input {
-      width: 80px;
-    }
-    .header-input:focus {
-      border-bottom-color: #f97316;
-    }
-    .header-input::-webkit-outer-spin-button,
-    .header-input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .header-input[type=number] {
-      -moz-appearance: textfield;
-    }
+    .header-input.name-input { width: 75px; }
+    .header-input:focus { border-bottom-color: #f97316; }
 
-    /* 식판 6칸 그리드 레이아웃 */
+    /* 식판 6칸 그리드 */
     .tray-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -114,7 +102,6 @@
       background-color: #ffffff;
     }
 
-    /* 안내 문구 */
     .slot-hint {
       font-size: 0.78rem;
       color: #94a3b8;
@@ -124,7 +111,6 @@
       line-height: 1.3;
     }
 
-    /* 다중 식재료 미니 태그(Chip) 리스트 */
     .ingredients-container {
       display: flex;
       flex-wrap: wrap;
@@ -144,7 +130,6 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    /* 카테고리별 태그 색상 */
     .chip-곡류 { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
     .chip-단백질 { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
     .chip-채소류 { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
@@ -196,7 +181,6 @@
       color: #2563eb;
     }
 
-    /* 1회 / 1/2회 분량 선택 스위치 */
     .serving-selector {
       display: flex;
       align-items: center;
@@ -225,7 +209,6 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
 
-    /* 카테고리 탭 및 식재료 버튼 Grid */
     .category-tabs {
       display: flex;
       gap: 8px;
@@ -254,7 +237,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 10px;
-      max-height: 240px;
+      max-height: 250px;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -278,7 +261,6 @@
     .food-item-btn .name { font-weight: 700; font-size: 0.85rem; color: #1e293b; }
     .food-item-btn .weight { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
 
-    /* 실시간 영양 대시보드 */
     .nutrition-section {
       background-color: #f8fafc;
       border-radius: 16px;
@@ -317,17 +299,18 @@
 <div class="app-container">
   <!-- 식판 영역 -->
   <div class="tray-frame">
-    <!-- 학년/반/이름 직접 수정 가능한 상단 타이틀 -->
+    <!-- 타이틀: 균형잡힌 식단 만들기 -->
     <div class="tray-header">
-      <input type="number" id="gradeInput" class="header-input" value="5" min="1" max="6">학년
-      <input type="number" id="classInput" class="header-input" value="1" min="1" max="20">반
-      <input type="text" id="nameInput" class="header-input name-input" value="김민준" placeholder="이름">의 식판
+      🍱 균형잡힌 식단 만들기 
+      (<input type="number" id="gradeInput" class="header-input" value="5" min="1" max="6">학년 
+      <input type="number" id="classInput" class="header-input" value="1" min="1" max="20">반 
+      <input type="text" id="nameInput" class="header-input name-input" value="김민준" placeholder="이름">)
     </div>
     
     <div class="tray-grid" id="trayGrid"></div>
   </div>
 
-  <!-- 컨트롤 및 식재료 선택 패널 -->
+  <!-- 컨트롤 패널 -->
   <div class="panel">
     <div class="panel-header">
       <div class="selected-slot-indicator" id="slotIndicator">
@@ -357,100 +340,197 @@
 </div>
 
 <script>
-  // 이미지 표 기준 곡류 30종 확장 및 전체 식품군 DB (1회 기준 중량 설정)
+  // 첨부 파일 기준 전체 식품 157종 DB (g / mL 단위 명시)
   const foodDatabase = [
-    // 곡류 (첨부 이미지 '곡류 1인 1회 분량' 30종 반영)
-    { id: 1, category: '곡류', name: '쌀밥', weight: 210 },
-    { id: 2, category: '곡류', name: '백미', weight: 90 },
-    { id: 3, category: '곡류', name: '보리', weight: 90 },
-    { id: 4, category: '곡류', name: '찹쌀', weight: 90 },
-    { id: 5, category: '곡류', name: '현미', weight: 90 },
-    { id: 6, category: '곡류', name: '조', weight: 90 },
-    { id: 7, category: '곡류', name: '수수', weight: 90 },
-    { id: 8, category: '곡류', name: '기장', weight: 90 },
-    { id: 9, category: '곡류', name: '팥', weight: 90 },
-    { id: 10, category: '곡류', name: '귀리', weight: 90 },
-    { id: 11, category: '곡류', name: '율무', weight: 90 },
-    { id: 12, category: '곡류', name: '옥수수', weight: 70 },
-    { id: 13, category: '곡류', name: '국수 말린 것', weight: 90 },
-    { id: 14, category: '곡류', name: '메밀국수 말린 것', weight: 90 },
-    { id: 15, category: '곡류', name: '냉면국수 말린 것', weight: 90 },
-    { id: 16, category: '곡류', name: '우동 생면', weight: 200 },
-    { id: 17, category: '곡류', name: '칼국수 생면', weight: 200 },
-    { id: 18, category: '곡류', name: '당면', weight: 30 },
-    { id: 19, category: '곡류', name: '라면사리', weight: 120 },
-    { id: 20, category: '곡류', name: '가래떡', weight: 150 },
-    { id: 21, category: '곡류', name: '백설기', weight: 150 },
-    { id: 22, category: '곡류', name: '식빵', weight: 35 },
-    { id: 23, category: '곡류', name: '시리얼', weight: 30 },
-    { id: 24, category: '곡류', name: '감자', weight: 140 },
-    { id: 25, category: '곡류', name: '고구마', weight: 70 },
-    { id: 26, category: '곡류', name: '묵', weight: 200 },
-    { id: 27, category: '곡류', name: '밤', weight: 60 },
-    { id: 28, category: '곡류', name: '밀가루', weight: 30 },
-    { id: 29, category: '곡류', name: '과자 스낵', weight: 30 },
-    { id: 30, category: '곡류', name: '과자 비스킷/쿠키', weight: 30 },
+    // 1. 곡류 (300 kcal)
+    { id: 1, category: '곡류', name: '쌀밥', weight: 210, unit: 'g' },
+    { id: 2, category: '곡류', name: '백미', weight: 90, unit: 'g' },
+    { id: 3, category: '곡류', name: '보리', weight: 90, unit: 'g' },
+    { id: 4, category: '곡류', name: '찹쌀', weight: 90, unit: 'g' },
+    { id: 5, category: '곡류', name: '현미', weight: 90, unit: 'g' },
+    { id: 6, category: '곡류', name: '조', weight: 90, unit: 'g' },
+    { id: 7, category: '곡류', name: '수수', weight: 90, unit: 'g' },
+    { id: 8, category: '곡류', name: '기장', weight: 90, unit: 'g' },
+    { id: 9, category: '곡류', name: '팥', weight: 90, unit: 'g' },
+    { id: 10, category: '곡류', name: '귀리', weight: 90, unit: 'g' },
+    { id: 11, category: '곡류', name: '율무', weight: 90, unit: 'g' },
+    { id: 12, category: '곡류', name: '옥수수', weight: 70, unit: 'g' },
+    { id: 13, category: '곡류', name: '국수 말린 것', weight: 90, unit: 'g' },
+    { id: 14, category: '곡류', name: '메밀국수 말린 것', weight: 90, unit: 'g' },
+    { id: 15, category: '곡류', name: '냉면국수 말린 것', weight: 90, unit: 'g' },
+    { id: 16, category: '곡류', name: '우동 생면', weight: 200, unit: 'g' },
+    { id: 17, category: '곡류', name: '칼국수 생면', weight: 200, unit: 'g' },
+    { id: 18, category: '곡류', name: '당면', weight: 30, unit: 'g' },
+    { id: 19, category: '곡류', name: '라면사리', weight: 120, unit: 'g' },
+    { id: 20, category: '곡류', name: '가래떡', weight: 150, unit: 'g' },
+    { id: 21, category: '곡류', name: '백설기', weight: 150, unit: 'g' },
+    { id: 22, category: '곡류', name: '식빵', weight: 35, unit: 'g' },
+    { id: 23, category: '곡류', name: '시리얼', weight: 30, unit: 'g' },
+    { id: 24, category: '곡류', name: '감자', weight: 140, unit: 'g' },
+    { id: 25, category: '곡류', name: '고구마', weight: 70, unit: 'g' },
+    { id: 26, category: '곡류', name: '묵', weight: 200, unit: 'g' },
+    { id: 27, category: '곡류', name: '밤', weight: 60, unit: 'g' },
+    { id: 28, category: '곡류', name: '밀가루', weight: 30, unit: 'g' },
+    { id: 29, category: '곡류', name: '과자 스낵', weight: 30, unit: 'g' },
+    { id: 30, category: '곡류', name: '과자 비스킷/쿠키', weight: 30, unit: 'g' },
 
-    // 고기·생선·달걀·콩류 (단백질)
-    { id: 31, category: '단백질', name: '소시지', weight: 30 },
-    { id: 32, category: '단백질', name: '두부', weight: 80 },
-    { id: 33, category: '단백질', name: '돼지고기', weight: 60 },
-    { id: 34, category: '단백질', name: '닭고기', weight: 60 },
-    { id: 35, category: '단백질', name: '쇠고기', weight: 60 },
-    { id: 36, category: '단백질', name: '달걀', weight: 50 },
-    { id: 37, category: '단백질', name: '고등어', weight: 50 },
-    { id: 38, category: '단백질', name: '오징어', weight: 50 },
-    { id: 39, category: '단백질', name: '햄', weight: 30 },
-    { id: 40, category: '단백질', name: '어묵', weight: 40 },
-    { id: 41, category: '단백질', name: '돈가스', weight: 80 },
+    // 2. 고기·생선·달걀·콩류 (단백질) (100 kcal)
+    { id: 31, category: '단백질', name: '돼지고기', weight: 60, unit: 'g' },
+    { id: 32, category: '단백질', name: '쇠고기', weight: 60, unit: 'g' },
+    { id: 33, category: '단백질', name: '닭고기', weight: 60, unit: 'g' },
+    { id: 34, category: '단백질', name: '오리고기', weight: 60, unit: 'g' },
+    { id: 35, category: '단백질', name: '소시지', weight: 30, unit: 'g' },
+    { id: 36, category: '단백질', name: '고등어', weight: 70, unit: 'g' },
+    { id: 37, category: '단백질', name: '명태', weight: 70, unit: 'g' },
+    { id: 38, category: '단백질', name: '조기', weight: 70, unit: 'g' },
+    { id: 39, category: '단백질', name: '꽁치', weight: 70, unit: 'g' },
+    { id: 40, category: '단백질', name: '갈치', weight: 70, unit: 'g' },
+    { id: 41, category: '단백질', name: '참치', weight: 70, unit: 'g' },
+    { id: 42, category: '단백질', name: '대구', weight: 70, unit: 'g' },
+    { id: 43, category: '단백질', name: '가자미', weight: 70, unit: 'g' },
+    { id: 44, category: '단백질', name: '광어', weight: 70, unit: 'g' },
+    { id: 45, category: '단백질', name: '연어', weight: 70, unit: 'g' },
+    { id: 46, category: '단백질', name: '게', weight: 80, unit: 'g' },
+    { id: 47, category: '단백질', name: '바지락', weight: 80, unit: 'g' },
+    { id: 48, category: '단백질', name: '굴', weight: 80, unit: 'g' },
+    { id: 49, category: '단백질', name: '홍합', weight: 80, unit: 'g' },
+    { id: 50, category: '단백질', name: '전복', weight: 80, unit: 'g' },
+    { id: 51, category: '단백질', name: '소라', weight: 80, unit: 'g' },
+    { id: 52, category: '단백질', name: '오징어', weight: 80, unit: 'g' },
+    { id: 53, category: '단백질', name: '새우', weight: 80, unit: 'g' },
+    { id: 54, category: '단백질', name: '낙지', weight: 80, unit: 'g' },
+    { id: 55, category: '단백질', name: '문어', weight: 80, unit: 'g' },
+    { id: 56, category: '단백질', name: '쭈꾸미', weight: 80, unit: 'g' },
+    { id: 57, category: '단백질', name: '멸치자건품', weight: 15, unit: 'g' },
+    { id: 58, category: '단백질', name: '오징어 말린 것', weight: 15, unit: 'g' },
+    { id: 59, category: '단백질', name: '새우자건품', weight: 15, unit: 'g' },
+    { id: 60, category: '단백질', name: '뱅어포', weight: 15, unit: 'g' },
+    { id: 61, category: '단백질', name: '명태 말린 것', weight: 15, unit: 'g' },
+    { id: 62, category: '단백질', name: '참치통조림', weight: 60, unit: 'g' },
+    { id: 63, category: '단백질', name: '어묵', weight: 30, unit: 'g' },
+    { id: 64, category: '단백질', name: '게맛살', weight: 30, unit: 'g' },
+    { id: 65, category: '단백질', name: '어류젓', weight: 40, unit: 'g' },
+    { id: 66, category: '단백질', name: '달걀', weight: 60, unit: 'g' },
+    { id: 67, category: '단백질', name: '메추리알', weight: 60, unit: 'g' },
+    { id: 68, category: '단백질', name: '두부', weight: 80, unit: 'g' },
+    { id: 69, category: '단백질', name: '두유', weight: 200, unit: 'mL' },
+    { id: 70, category: '단백질', name: '대두', weight: 20, unit: 'g' },
+    { id: 71, category: '단백질', name: '완두콩', weight: 20, unit: 'g' },
+    { id: 72, category: '단백질', name: '강낭콩', weight: 20, unit: 'g' },
+    { id: 73, category: '단백질', name: '렌틸콩', weight: 20, unit: 'g' },
+    { id: 74, category: '단백질', name: '녹두', weight: 20, unit: 'g' },
+    { id: 75, category: '단백질', name: '아몬드', weight: 10, unit: 'g' },
+    { id: 76, category: '단백질', name: '호두', weight: 10, unit: 'g' },
+    { id: 77, category: '단백질', name: '잣', weight: 10, unit: 'g' },
+    { id: 78, category: '단백질', name: '땅콩', weight: 10, unit: 'g' },
+    { id: 79, category: '단백질', name: '해바라기씨', weight: 10, unit: 'g' },
+    { id: 80, category: '단백질', name: '호박씨', weight: 10, unit: 'g' },
+    { id: 81, category: '단백질', name: '은행', weight: 10, unit: 'g' },
+    { id: 82, category: '단백질', name: '캐슈넛', weight: 10, unit: 'g' },
 
-    // 채소류
-    { id: 42, category: '채소류', name: '배추김치', weight: 40 },
-    { id: 43, category: '채소류', name: '깍두기', weight: 40 },
-    { id: 44, category: '채소류', name: '콩나물', weight: 50 },
-    { id: 45, category: '채소류', name: '시금치', weight: 70 },
-    { id: 46, category: '채소류', name: '양파', weight: 40 },
-    { id: 47, category: '채소류', name: '무', weight: 50 },
-    { id: 48, category: '채소류', name: '상추/쌈채소', weight: 30 },
-    { id: 49, category: '채소류', name: '오이', weight: 40 },
-    { id: 50, category: '채소류', name: '브로콜리', weight: 50 },
-    { id: 51, category: '채소류', name: '버섯', weight: 50 },
+    // 3. 채소류 (15 kcal)
+    { id: 83, category: '채소류', name: '양파', weight: 70, unit: 'g' },
+    { id: 84, category: '채소류', name: '파', weight: 70, unit: 'g' },
+    { id: 85, category: '채소류', name: '당근', weight: 70, unit: 'g' },
+    { id: 86, category: '채소류', name: '무', weight: 70, unit: 'g' },
+    { id: 87, category: '채소류', name: '애호박', weight: 70, unit: 'g' },
+    { id: 88, category: '채소류', name: '오이', weight: 70, unit: 'g' },
+    { id: 89, category: '채소류', name: '콩나물', weight: 70, unit: 'g' },
+    { id: 90, category: '채소류', name: '시금치', weight: 70, unit: 'g' },
+    { id: 91, category: '채소류', name: '상추', weight: 70, unit: 'g' },
+    { id: 92, category: '채소류', name: '배추', weight: 70, unit: 'g' },
+    { id: 93, category: '채소류', name: '양배추', weight: 70, unit: 'g' },
+    { id: 94, category: '채소류', name: '깻잎', weight: 70, unit: 'g' },
+    { id: 95, category: '채소류', name: '피망', weight: 70, unit: 'g' },
+    { id: 96, category: '채소류', name: '부추', weight: 70, unit: 'g' },
+    { id: 97, category: '채소류', name: '토마토', weight: 70, unit: 'g' },
+    { id: 98, category: '채소류', name: '쑥갓', weight: 70, unit: 'g' },
+    { id: 99, category: '채소류', name: '무청', weight: 70, unit: 'g' },
+    { id: 100, category: '채소류', name: '붉은고추', weight: 70, unit: 'g' },
+    { id: 101, category: '채소류', name: '숙주나물', weight: 70, unit: 'g' },
+    { id: 102, category: '채소류', name: '고사리', weight: 70, unit: 'g' },
+    { id: 103, category: '채소류', name: '미나리', weight: 70, unit: 'g' },
+    { id: 104, category: '채소류', name: '파프리카', weight: 70, unit: 'g' },
+    { id: 105, category: '채소류', name: '양상추', weight: 70, unit: 'g' },
+    { id: 106, category: '채소류', name: '치커리', weight: 70, unit: 'g' },
+    { id: 107, category: '채소류', name: '샐러리', weight: 70, unit: 'g' },
+    { id: 108, category: '채소류', name: '브로콜리', weight: 70, unit: 'g' },
+    { id: 109, category: '채소류', name: '가지', weight: 70, unit: 'g' },
+    { id: 110, category: '채소류', name: '아욱', weight: 70, unit: 'g' },
+    { id: 111, category: '채소류', name: '취나물', weight: 70, unit: 'g' },
+    { id: 112, category: '채소류', name: '고춧잎', weight: 70, unit: 'g' },
+    { id: 113, category: '채소류', name: '단호박', weight: 70, unit: 'g' },
+    { id: 114, category: '채소류', name: '늙은호박', weight: 70, unit: 'g' },
+    { id: 115, category: '채소류', name: '고구마줄기', weight: 70, unit: 'g' },
+    { id: 116, category: '채소류', name: '마늘종', weight: 70, unit: 'g' },
+    { id: 117, category: '채소류', name: '배추김치', weight: 40, unit: 'g' },
+    { id: 118, category: '채소류', name: '깍두기', weight: 40, unit: 'g' },
+    { id: 119, category: '채소류', name: '단무지', weight: 40, unit: 'g' },
+    { id: 120, category: '채소류', name: '열무김치', weight: 40, unit: 'g' },
+    { id: 121, category: '채소류', name: '총각김치', weight: 40, unit: 'g' },
+    { id: 122, category: '채소류', name: '오이소박이', weight: 40, unit: 'g' },
+    { id: 123, category: '채소류', name: '우엉', weight: 40, unit: 'g' },
+    { id: 124, category: '채소류', name: '연근', weight: 40, unit: 'g' },
+    { id: 125, category: '채소류', name: '도라지', weight: 40, unit: 'g' },
+    { id: 126, category: '채소류', name: '토란대', weight: 40, unit: 'g' },
+    { id: 127, category: '채소류', name: '마늘', weight: 10, unit: 'g' },
+    { id: 128, category: '채소류', name: '생강', weight: 10, unit: 'g' },
+    { id: 129, category: '채소류', name: '미역 마른 것', weight: 10, unit: 'g' },
+    { id: 130, category: '채소류', name: '다시마 마른 것', weight: 10, unit: 'g' },
+    { id: 131, category: '채소류', name: '김', weight: 2, unit: 'g' },
+    { id: 132, category: '채소류', name: '느타리버섯', weight: 30, unit: 'g' },
+    { id: 133, category: '채소류', name: '표고버섯', weight: 30, unit: 'g' },
+    { id: 134, category: '채소류', name: '양송이버섯', weight: 30, unit: 'g' },
+    { id: 135, category: '채소류', name: '팽이버섯', weight: 30, unit: 'g' },
+    { id: 136, category: '채소류', name: '새송이버섯', weight: 30, unit: 'g' },
 
-    // 과일 / 유제품 (후식)
-    { id: 52, category: '후식', name: '사과', weight: 100 },
-    { id: 53, category: '후식', name: '바나나', weight: 100 },
-    { id: 54, category: '후식', name: '귤', weight: 100 },
-    { id: 55, category: '후식', name: '방울토마토', weight: 80 },
-    { id: 56, category: '후식', name: '포도', weight: 100 },
-    { id: 57, category: '후식', name: '우유', weight: 200 },
-    { id: 58, category: '후식', name: '요구르트', weight: 100 },
-    { id: 59, category: '후식', name: '치즈', weight: 20 }
+    // 4. 과일류 (50 kcal) 및 우유·유제품류 (125 kcal)
+    { id: 137, category: '후식', name: '수박', weight: 150, unit: 'g' },
+    { id: 138, category: '후식', name: '참외', weight: 150, unit: 'g' },
+    { id: 139, category: '후식', name: '딸기', weight: 150, unit: 'g' },
+    { id: 140, category: '후식', name: '사과', weight: 100, unit: 'g' },
+    { id: 141, category: '후식', name: '귤', weight: 100, unit: 'g' },
+    { id: 142, category: '후식', name: '배', weight: 100, unit: 'g' },
+    { id: 143, category: '후식', name: '바나나', weight: 100, unit: 'g' },
+    { id: 144, category: '후식', name: '감', weight: 100, unit: 'g' },
+    { id: 145, category: '후식', name: '포도', weight: 100, unit: 'g' },
+    { id: 146, category: '후식', name: '복숭아', weight: 100, unit: 'g' },
+    { id: 147, category: '후식', name: '오렌지', weight: 100, unit: 'g' },
+    { id: 148, category: '후식', name: '키위', weight: 100, unit: 'g' },
+    { id: 149, category: '후식', name: '파인애플', weight: 100, unit: 'g' },
+    { id: 150, category: '후식', name: '블루베리', weight: 100, unit: 'g' },
+    { id: 151, category: '후식', name: '자두', weight: 100, unit: 'g' },
+    { id: 152, category: '후식', name: '대추 말린 것', weight: 15, unit: 'g' },
+    { id: 153, category: '후식', name: '우유', weight: 200, unit: 'mL' },
+    { id: 154, category: '후식', name: '호상요구르트', weight: 100, unit: 'g' },
+    { id: 155, category: '후식', name: '액상요구르트', weight: 150, unit: 'mL' },
+    { id: 156, category: '후식', name: '아이스크림/셔벗', weight: 100, unit: 'g' },
+    { id: 157, category: '후식', name: '치즈', weight: 20, unit: 'g' }
   ];
 
-  // 이미지 기준 기본 식판 6칸 상태 및 초기 데이터
+  // 식판 6칸 기본 구성
   let slots = [
     { defaultLabel: '주반찬 (고기·생선·달걀·콩)', menuName: '', ingredients: [] },
     { defaultLabel: '부반찬 1 (채소류)', menuName: '', ingredients: [] },
     { defaultLabel: '부반찬 2 (채소류)', menuName: '', ingredients: [] },
     { defaultLabel: '후식 (과일/유제품)', menuName: '', ingredients: [] },
     { defaultLabel: '밥 (곡류)', menuName: '쌀밥', ingredients: [
-        { foodId: 1, name: '쌀밥', category: '곡류', serving: 1.0, weight: 210, baseWeight: 210 }
+        { foodId: 1, name: '쌀밥', category: '곡류', serving: 1.0, weight: 210, baseWeight: 210, unit: 'g' }
       ]
     },
     { defaultLabel: '국 / 메인', menuName: '부대찌개', ingredients: [
-        { foodId: 31, name: '소시지', category: '단백질', serving: 0.5, weight: 15, baseWeight: 30 },
-        { foodId: 32, name: '두부', category: '단백질', serving: 0.5, weight: 40, baseWeight: 80 },
-        { foodId: 42, name: '배추김치', category: '채소류', serving: 0.5, weight: 20, baseWeight: 40 },
-        { foodId: 19, name: '라면사리', category: '곡류', serving: 0.5, weight: 60, baseWeight: 120 }
+        { foodId: 35, name: '소시지', category: '단백질', serving: 0.5, weight: 15, baseWeight: 30, unit: 'g' },
+        { foodId: 68, name: '두부', category: '단백질', serving: 0.5, weight: 40, baseWeight: 80, unit: 'g' },
+        { foodId: 117, name: '배추김치', category: '채소류', serving: 0.5, weight: 20, baseWeight: 40, unit: 'g' },
+        { foodId: 19, name: '라면사리', category: '곡류', serving: 0.5, weight: 60, baseWeight: 120, unit: 'g' }
       ]
     }
   ];
 
-  let activeSlotIndex = 4; // 기본 선택: 밥 칸
-  let currentServing = 1.0; // 기본 선택 분량 (1회)
+  let activeSlotIndex = 4;
+  let currentServing = 1.0;
   let currentCategory = '전체';
 
-  // 초기화
   window.onload = function() {
     renderTray();
     renderCategoryTabs();
@@ -459,7 +539,11 @@
     updateSlotIndicator();
   };
 
-  // 1. 식판 UI 렌더링
+  function getCalculatedWeight(baseWeight, serving) {
+    const val = baseWeight * serving;
+    return Number.isInteger(val) ? val : val.toFixed(1);
+  }
+
   function renderTray() {
     const grid = document.getElementById('trayGrid');
     grid.innerHTML = '';
@@ -473,7 +557,6 @@
         selectSlot(sIdx);
       };
 
-      // 상단 메뉴명 직접 입력 input
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'menu-name-input';
@@ -485,7 +568,6 @@
 
       slotDiv.appendChild(input);
 
-      // 식재료 미니 태그 리스트
       if (slot.ingredients.length === 0) {
         const hint = document.createElement('div');
         hint.className = 'slot-hint';
@@ -499,7 +581,7 @@
           const chip = document.createElement('div');
           chip.className = `chip chip-${ing.category}`;
           chip.innerHTML = `
-            ${ing.name}(${ing.weight}g)
+            ${ing.name}(${ing.weight}${ing.unit})
             <span class="chip-serving-badge" title="클릭하여 분량 변경" onclick="toggleChipServing(${sIdx}, ${iIdx}, event)">
               ${ing.serving === 1.0 ? '1회' : '1/2회'}
             </span>
@@ -514,7 +596,6 @@
     });
   }
 
-  // 2. 칸 선택
   function selectSlot(index) {
     activeSlotIndex = index;
     renderTray();
@@ -528,7 +609,6 @@
     indicator.innerHTML = `🎯 현재 선택된 칸: <strong>[ ${activeSlotIndex + 1}번 칸 - ${name} ]</strong>`;
   }
 
-  // 3. 분량 선택 스위치 (1회 / 0.5회)
   function setServing(servingVal) {
     currentServing = servingVal;
     document.getElementById('btnServing1').classList.toggle('active', servingVal === 1.0);
@@ -536,17 +616,15 @@
     renderFoodGrid();
   }
 
-  // 4. 태그 내에서 분량 즉시 전환 (1회 ↔ 0.5회)
   function toggleChipServing(sIdx, iIdx, event) {
     event.stopPropagation();
     const ing = slots[sIdx].ingredients[iIdx];
     ing.serving = ing.serving === 1.0 ? 0.5 : 1.0;
-    ing.weight = Math.round(ing.baseWeight * ing.serving);
+    ing.weight = getCalculatedWeight(ing.baseWeight, ing.serving);
     renderTray();
     renderNutritionDashboard();
   }
 
-  // 5. 식재료 삭제
   function removeIngredient(sIdx, iIdx, event) {
     event.stopPropagation();
     slots[sIdx].ingredients.splice(iIdx, 1);
@@ -554,14 +632,13 @@
     renderNutritionDashboard();
   }
 
-  // 6. 식재료 추가
   function addIngredient(food) {
     if (activeSlotIndex === null) {
       alert("식재료를 추가할 식판 칸을 선택해 주세요.");
       return;
     }
 
-    const calculatedWeight = Math.round(food.weight * currentServing);
+    const calculatedWeight = getCalculatedWeight(food.weight, currentServing);
 
     slots[activeSlotIndex].ingredients.push({
       foodId: food.id,
@@ -569,14 +646,14 @@
       category: food.category,
       serving: currentServing,
       weight: calculatedWeight,
-      baseWeight: food.weight
+      baseWeight: food.weight,
+      unit: food.unit
     });
 
     renderTray();
     renderNutritionDashboard();
   }
 
-  // 7. 카테고리 탭 및 식재료 버튼 Grid
   function renderCategoryTabs() {
     const categories = ['전체', '곡류', '단백질', '채소류', '후식'];
     const container = document.getElementById('categoryTabs');
@@ -613,24 +690,18 @@
       btn.className = 'food-item-btn';
       btn.onclick = () => addIngredient(food);
 
-      const calculatedWeight = Math.round(food.weight * currentServing);
+      const calculatedWeight = getCalculatedWeight(food.weight, currentServing);
 
       btn.innerHTML = `
         <div class="name">${food.name}</div>
-        <div class="weight">${calculatedWeight}g (${currentServing === 1.0 ? '1회' : '1/2회'})</div>
+        <div class="weight">${calculatedWeight}${food.unit} (${currentServing === 1.0 ? '1회' : '1/2회'})</div>
       `;
       grid.appendChild(btn);
     });
   }
 
-  // 8. 실시간 영양 대시보드 (통합 스캔)
   function renderNutritionDashboard() {
-    const totals = {
-      '곡류': 0,
-      '단백질': 0,
-      '채소류': 0,
-      '후식': 0
-    };
+    const totals = { '곡류': 0, '단백질': 0, '채소류': 0, '후식': 0 };
 
     slots.forEach(slot => {
       slot.ingredients.forEach(ing => {
