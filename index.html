@@ -21,7 +21,7 @@
       
       /* 식품구성자전거 상징 색상 */
       --color-grain: #fbc02d;      /* 곡류: 노랑 */
-      --color-protein: #ba68c8;    /* 고기·생선: 보라 */
+      --color-protein: #ba68c8;    /* 고기·생선·달걀·콩류: 보라 */
       --color-veggie: #66bb6a;     /* 채소류: 초록 */
       --color-fruit: #ef5350;      /* 과일류: 빨강 */
       --color-milk: #29b6f6;       /* 우유·유제품: 하늘 */
@@ -205,7 +205,7 @@
 
     .placed-food-name {
       font-family: 'Jua', sans-serif;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: #263238;
       margin-top: 5px;
       word-break: keep-all;
@@ -268,7 +268,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
       padding: 10px;
       background: #f9fbe7;
@@ -303,7 +303,7 @@
       color: white;
     }
     .badge-곡류 { background-color: var(--color-grain); color: #333; }
-    .badge-단백질 { background-color: var(--color-protein); }
+    [class*="badge-고기"] { background-color: var(--color-protein); }
     .badge-채소류 { background-color: var(--color-veggie); }
     .badge-과일류 { background-color: var(--color-fruit); }
     .badge-유제품 { background-color: var(--color-milk); }
@@ -363,7 +363,7 @@
     </div>
     <div class="checklist-grid">
       <div class="check-item" id="check-rice">⚪ 🍚 밥 칸에 곡류 담기</div>
-      <div class="check-item" id="check-protein">⚪ 🥩 단백질 적정량(1~2개)</div>
+      <div class="check-item" id="check-protein">⚪ 🥩 고기·생선·달걀·콩류 적정량(1~2개)</div>
       <div class="check-item" id="check-veggie">⚪ 🥦 채소류 2가지 이상</div>
       <div class="check-item" id="check-dessert">⚪ 🍎 과일/유제품 1~2개</div>
       <div class="check-item" id="check-full">⚪ 🍱 6개 칸 모두 채우기</div>
@@ -381,7 +381,7 @@
         <!-- 상단 4개 반찬/후식 칸 -->
         <div class="slot active" data-slot-id="side1" onclick="selectSlot(this)">
           <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
-          <span class="slot-label">주반찬 (고기·생선·콩)</span>
+          <span class="slot-label">주반찬 (고기·생선·달걀·콩)</span>
         </div>
         <div class="slot" data-slot-id="side2" onclick="selectSlot(this)">
           <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
@@ -415,7 +415,7 @@
     <div class="category-tabs">
       <button class="tab-btn active" onclick="filterCategory('전체', this)">전체</button>
       <button class="tab-btn" onclick="filterCategory('곡류', this)">🌾 곡류</button>
-      <button class="tab-btn" onclick="filterCategory('단백질', this)">🥩 고기·생선·콩</button>
+      <button class="tab-btn" onclick="filterCategory('고기·생선·달걀·콩류', this)">🥩 고기·생선·달걀·콩류</button>
       <button class="tab-btn" onclick="filterCategory('채소류', this)">🥦 채소류</button>
       <button class="tab-btn" onclick="filterCategory('과일류', this)">🍎 과일류</button>
       <button class="tab-btn" onclick="filterCategory('유제품', this)">🥛 우유·유제품</button>
@@ -434,61 +434,122 @@
 </div>
 
 <script>
-  // 1. PDF 및 보건복지부 1인 1회 분량 기준 데이터베이스
+  // 보건복지부 식사구성안 1인 1회 분량 정밀 데이터베이스
   const foodDatabase = [
-    // 곡류 (첨부 이미지 기준 30개 항목 정밀 교체)
-    { name: "쌀밥(210g)", category: "곡류" },
-    { name: "백미(90g)", category: "곡류" },
-    { name: "보리(90g)", category: "곡류" },
-    { name: "찹쌀(90g)", category: "곡류" },
-    { name: "현미(90g)", category: "곡류" },
-    { name: "조(90g)", category: "곡류" },
-    { name: "수수(90g)", category: "곡류" },
-    { name: "기장(90g)", category: "곡류" },
-    { name: "팥(90g)", category: "곡류" },
-    { name: "귀리(90g)", category: "곡류" },
-    { name: "율무(90g)", category: "곡류" },
-    { name: "옥수수(70g)", category: "곡류" },
-    { name: "국수 말린 것(90g)", category: "곡류" },
-    { name: "메밀국수 말린 것(90g)", category: "곡류" },
-    { name: "냉면국수 말린 것(90g)", category: "곡류" },
-    { name: "우동 생면(200g)", category: "곡류" },
-    { name: "칼국수 생면(200g)", category: "곡류" },
-    { name: "당면(30g)", category: "곡류" },
-    { name: "라면사리(120g)", category: "곡류" },
-    { name: "가래떡(150g)", category: "곡류" },
-    { name: "백설기(150g)", category: "곡류" },
-    { name: "식빵(35g)", category: "곡류" },
-    { name: "시리얼(30g)", category: "곡류" },
-    { name: "감자(140g)", category: "곡류" },
-    { name: "고구마(70g)", category: "곡류" },
-    { name: "묵(200g)", category: "곡류" },
-    { name: "밤(60g)", category: "곡류" },
-    { name: "밀가루(30g)", category: "곡류" },
-    { name: "과자 스낵(30g)", category: "곡류" },
-    { name: "과자 비스킷/쿠키(30g)", category: "곡류" },
+    // 1. 곡류 (30개 항목)
+    { name: "쌀밥(210g)", category: "곡류" }, { name: "백미(90g)", category: "곡류" },
+    { name: "보리(90g)", category: "곡류" }, { name: "찹쌀(90g)", category: "곡류" },
+    { name: "현미(90g)", category: "곡류" }, { name: "조(90g)", category: "곡류" },
+    { name: "수수(90g)", category: "곡류" }, { name: "기장(90g)", category: "곡류" },
+    { name: "팥(90g)", category: "곡류" }, { name: "귀리(90g)", category: "곡류" },
+    { name: "율무(90g)", category: "곡류" }, { name: "옥수수(70g)", category: "곡류" },
+    { name: "국수 말린 것(90g)", category: "곡류" }, { name: "메밀국수 말린 것(90g)", category: "곡류" },
+    { name: "냉면국수 말린 것(90g)", category: "곡류" }, { name: "우동 생면(200g)", category: "곡류" },
+    { name: "칼국수 생면(200g)", category: "곡류" }, { name: "당면(30g)", category: "곡류" },
+    { name: "라면사리(120g)", category: "곡류" }, { name: "가래떡(150g)", category: "곡류" },
+    { name: "백설기(150g)", category: "곡류" }, { name: "식빵(35g)", category: "곡류" },
+    { name: "시리얼(30g)", category: "곡류" }, { name: "감자(140g)", category: "곡류" },
+    { name: "고구마(70g)", category: "곡류" }, { name: "묵(200g)", category: "곡류" },
+    { name: "밤(60g)", category: "곡류" }, { name: "밀가루(30g)", category: "곡류" },
+    { name: "과자 스낵(30g)", category: "곡류" }, { name: "과자 비스킷/쿠키(30g)", category: "곡류" },
 
-    // 고기·생선·달걀·콩류 (단백질)
-    { name: "돼지고기볶음", category: "단백질" }, { name: "쇠고기구이", category: "단백질" },
-    { name: "닭갈비", category: "단백질" }, { name: "고등어조림", category: "단백질" },
-    { name: "달걀말이", category: "단백질" }, { name: "두부조림", category: "단백질" },
-    { name: "오징어볶음", category: "단백질" }, { name: "어묵볶음", category: "단백질" },
+    // 2. 고기·생선·달걀·콩류 (47개 항목)
+    { name: "돼지고기(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "쇠고기(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "닭고기(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "오리고기(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "소시지(30g)", category: "고기·생선·달걀·콩류" },
+    { name: "고등어(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "명태(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "조기(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "꽁치(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "갈치(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "참치(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "대구(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "가자미(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "광어(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "연어(70g)", category: "고기·생선·달걀·콩류" },
+    { name: "게(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "바지락(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "굴(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "홍합(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "전복(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "소라(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "오징어(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "새우(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "낙지(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "문어(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "쭈꾸미(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "멸치자건품(15g)", category: "고기·생선·달걀·콩류" },
+    { name: "오징어 말린 것(15g)", category: "고기·생선·달걀·콩류" },
+    { name: "새우자건품(15g)", category: "고기·생선·달걀·콩류" },
+    { name: "뱅어포(15g)", category: "고기·생선·달걀·콩류" },
+    { name: "명태 말린 것(15g)", category: "고기·생선·달걀·콩류" },
+    { name: "참치통조림(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "어묵(30g)", category: "고기·생선·달걀·콩류" },
+    { name: "게맛살(30g)", category: "고기·생선·달걀·콩류" },
+    { name: "달걀(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "메추리알(60g)", category: "고기·생선·달걀·콩류" },
+    { name: "두부(80g)", category: "고기·생선·달걀·콩류" },
+    { name: "두유(200mL)", category: "고기·생선·달걀·콩류" },
+    { name: "대두(20g)", category: "고기·생선·달걀·콩류" },
+    { name: "완두콩(20g)", category: "고기·생선·달걀·콩류" },
+    { name: "강낭콩(20g)", category: "고기·생선·달걀·콩류" },
+    { name: "렌틸콩(20g)", category: "고기·생선·달걀·콩류" },
+    { name: "녹두(20g)", category: "고기·생선·달걀·콩류" },
+    { name: "아몬드(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "호두(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "잣(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "땅콩(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "해바라기씨(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "호박씨(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "은행(10g)", category: "고기·생선·달걀·콩류" },
+    { name: "캐슈넛(10g)", category: "고기·생선·달걀·콩류" },
 
-    // 채소류
-    { name: "배추김치", category: "채소류" }, { name: "콩나물무침", category: "채소류" },
-    { name: "시금치나물", category: "채소류" }, { name: "오이소박이", category: "채소류" },
-    { name: "깍두기", category: "채소류" }, { name: "브로콜리", category: "채소류" },
-    { name: "상추쌈", category: "채소류" }, { name: "느타리버섯볶음", category: "채소류" },
+    // 3. 채소류 (55개 항목)
+    { name: "양파(70g)", category: "채소류" }, { name: "파(70g)", category: "채소류" },
+    { name: "당근(70g)", category: "채소류" }, { name: "무(70g)", category: "채소류" },
+    { name: "애호박(70g)", category: "채소류" }, { name: "오이(70g)", category: "채소류" },
+    { name: "콩나물(70g)", category: "채소류" }, { name: "시금치(70g)", category: "채소류" },
+    { name: "상추(70g)", category: "채소류" }, { name: "배추(70g)", category: "채소류" },
+    { name: "양배추(70g)", category: "채소류" }, { name: "깻잎(70g)", category: "채소류" },
+    { name: "피망(70g)", category: "채소류" }, { name: "부추(70g)", category: "채소류" },
+    { name: "토마토(70g)", category: "채소류" }, { name: "쑥갓(70g)", category: "채소류" },
+    { name: "무청(70g)", category: "채소류" }, { name: "붉은고추(70g)", category: "채소류" },
+    { name: "숙주나물(70g)", category: "채소류" }, { name: "고사리(70g)", category: "채소류" },
+    { name: "미나리(70g)", category: "채소류" }, { name: "파프리카(70g)", category: "채소류" },
+    { name: "양상추(70g)", category: "채소류" }, { name: "치커리(70g)", category: "채소류" },
+    { name: "샐러리(70g)", category: "채소류" }, { name: "브로콜리(70g)", category: "채소류" },
+    { name: "가지(70g)", category: "채소류" }, { name: "아욱(70g)", category: "채소류" },
+    { name: "취나물(70g)", category: "채소류" }, { name: "고춧잎(70g)", category: "채소류" },
+    { name: "단호박(70g)", category: "채소류" }, { name: "늙은호박(70g)", category: "채소류" },
+    { name: "고구마줄기(70g)", category: "채소류" }, { name: "마늘종(70g)", category: "채소류" },
+    { name: "풋마늘(70g)", category: "채소류" }, { name: "배추김치(40g)", category: "채소류" },
+    { name: "깍두기(40g)", category: "채소류" }, { name: "단무지(40g)", category: "채소류" },
+    { name: "열무김치(40g)", category: "채소류" }, { name: "총각김치(40g)", category: "채소류" },
+    { name: "오이소박이(40g)", category: "채소류" }, { name: "우엉(40g)", category: "채소류" },
+    { name: "연근(40g)", category: "채소류" }, { name: "도라지(40g)", category: "채소류" },
+    { name: "토란대(40g)", category: "채소류" }, { name: "마늘(10g)", category: "채소류" },
+    { name: "생강(10g)", category: "채소류" }, { name: "미역 마른 것(10g)", category: "채소류" },
+    { name: "다시마 마른 것(10g)", category: "채소류" }, { name: "김(2g)", category: "채소류" },
+    { name: "느타리버섯(30g)", category: "채소류" }, { name: "표고버섯(30g)", category: "채소류" },
+    { name: "양송이버섯(30g)", category: "채소류" }, { name: "팽이버섯(30g)", category: "채소류" },
+    { name: "새송이버섯(30g)", category: "채소류" },
 
-    // 과일류
-    { name: "사과", category: "과일류" }, { name: "귤", category: "과일류" },
-    { name: "수박", category: "과일류" }, { name: "참외", category: "과일류" },
-    { name: "포도", category: "과일류" }, { name: "바나나", category: "과일류" },
-    { name: "샤인머스캣", category: "과일류" },
+    // 4. 과일류 (16개 항목)
+    { name: "수박(150g)", category: "과일류" }, { name: "참외(150g)", category: "과일류" },
+    { name: "딸기(150g)", category: "과일류" }, { name: "사과(100g)", category: "과일류" },
+    { name: "귤(100g)", category: "과일류" }, { name: "배(100g)", category: "과일류" },
+    { name: "바나나(100g)", category: "과일류" }, { name: "감(100g)", category: "과일류" },
+    { name: "포도(100g)", category: "과일류" }, { name: "복숭아(100g)", category: "과일류" },
+    { name: "오렌지(100g)", category: "과일류" }, { name: "키위(100g)", category: "과일류" },
+    { name: "파인애플(100g)", category: "과일류" }, { name: "블루베리(100g)", category: "과일류" },
+    { name: "자두(100g)", category: "과일류" }, { name: "대추 마른 것(15g)", category: "과일류" },
 
-    // 우유·유제품류
-    { name: "우유", category: "유제품" }, { name: "슬라이스치즈", category: "유제품" },
-    { name: "요거트", category: "유제품" }, { name: "아이스크림", category: "유제품" }
+    // 5. 우유·유제품류 (5개 항목)
+    { name: "우유(200mL)", category: "유제품" }, { name: "호상요구르트(100g)", category: "유제품" },
+    { name: "액상요구르트(150mL)", category: "유제품" }, { name: "아이스크림/셔벗(100g)", category: "유제품" },
+    { name: "치즈(20g)", category: "유제품" }
   ];
 
   let currentSelectedSlot = document.querySelector('.slot.active');
@@ -524,7 +585,7 @@
     const labels = {
       rice: '밥 칸 (곡류만 가능)',
       soup: '국 / 찌개 칸',
-      side1: '주반찬 (고기·생선·콩)',
+      side1: '주반찬 (고기·생선·달걀·콩)',
       side2: '부반찬 1 (채소류)',
       side3: '부반찬 2 (채소류)',
       dessert: '후식 (과일/유제품)'
@@ -567,7 +628,7 @@
 
     // 밥 칸 규칙 검증 (곡류만 허용)
     if (currentSelectedSlot.dataset.slotId === 'rice' && foodItem.category !== '곡류') {
-      alert("⚠️ 밥 칸에는 우리 몸의 중요한 에너지원이 되는 '곡류'(쌀밥, 현미밥, 식빵 등)를 담아주세요!");
+      alert("⚠️ 밥 칸에는 우리 몸의 중요한 에너지원이 되는 '곡류'(쌀밥, 현미밥, 감자 등)를 담아주세요!");
       return;
     }
 
@@ -590,12 +651,12 @@
       return;
     }
 
-    const foodName = prompt("음식 이름을 입력해 주세요 (예: 감자(140g)):");
+    const foodName = prompt("음식 이름을 입력해 주세요 (예: 시금치나물(70g)):");
     if (!foodName) return;
 
-    const catInput = prompt("어떤 식품군인가요?\n(곡류 / 단백질 / 채소류 / 과일류 / 유제품 중에서 입력)", "곡류");
-    let category = "곡류";
-    if (["곡류", "단백질", "채소류", "과일류", "유제품"].includes(catInput)) {
+    const catInput = prompt("어떤 식품군인가요?\n(곡류 / 고기·생선·달걀·콩류 / 채소류 / 과일류 / 유제품 중에서 입력)", "채소류");
+    let category = "채소류";
+    if (["곡류", "고기·생선·달걀·콩류", "채소류", "과일류", "유제품"].includes(catInput)) {
       category = catInput;
     }
 
@@ -605,14 +666,14 @@
   // 실시간 영양 체크리스트 업데이트
   function updateChecklist() {
     const slots = document.querySelectorAll('.slot');
-    let counts = { 곡류: 0, 단백질: 0, 채소류: 0, 과일류: 0, 유제품: 0 };
+    let counts = { 곡류: 0, "고기·생선·달걀·콩류": 0, 채소류: 0, 과일류: 0, 유제품: 0 };
     let filledCount = 0;
     let isRiceValid = false;
 
     slots.forEach(slot => {
       const cat = slot.dataset.category;
       if (cat) {
-        counts[cat]++;
+        counts[cat] = (counts[cat] || 0) + 1;
         filledCount++;
       }
       if (slot.dataset.slotId === 'rice' && cat === '곡류') {
@@ -620,11 +681,13 @@
       }
     });
 
+    const proteinCount = counts["고기·생선·달걀·콩류"] || 0;
+
     // 1. 밥 칸 곡류 여부
     setCheckState('check-rice', isRiceValid, '🍚 밥 칸에 곡류 담기');
-    // 2. 단백질 적정량 (1~2개)
-    const isProteinValid = (counts.단백질 >= 1 && counts.단백질 <= 2);
-    setCheckState('check-protein', isProteinValid, `🥩 단백질 적정량(1~2개) [현재:${counts.단백질}개]`);
+    // 2. 고기·생선·달걀·콩류 적정량 (1~2개)
+    const isProteinValid = (proteinCount >= 1 && proteinCount <= 2);
+    setCheckState('check-protein', isProteinValid, `🥩 고기·생선·달걀·콩류 적정량(1~2개) [현재:${proteinCount}개]`);
     // 3. 채소류 2개 이상
     const isVeggieValid = (counts.채소류 >= 2);
     setCheckState('check-veggie', isVeggieValid, `🥦 채소류 2가지 이상 [현재:${counts.채소류}개]`);
@@ -650,20 +713,22 @@
   // 최종 영양 검증 및 경고 팝업
   function validateNutrition() {
     const slots = document.querySelectorAll('.slot');
-    let counts = { 곡류: 0, 단백질: 0, 채소류: 0, 과일류: 0, 유제품: 0 };
+    let counts = { 곡류: 0, "고기·생선·달걀·콩류": 0, 채소류: 0, 과일류: 0, 유제품: 0 };
     let filledCount = 0;
     let riceCategory = "";
 
     slots.forEach(slot => {
       const cat = slot.dataset.category;
       if (cat) {
-        counts[cat]++;
+        counts[cat] = (counts[cat] || 0) + 1;
         filledCount++;
       }
       if (slot.dataset.slotId === 'rice') {
         riceCategory = cat;
       }
     });
+
+    const proteinCount = counts["고기·생선·달걀·콩류"] || 0;
 
     // 규칙 1: 빈 칸 검사
     if (filledCount < 6) {
@@ -677,9 +742,9 @@
       return false;
     }
 
-    // 규칙 3: 단백질 과다 검사 (3개 이상 시 차단)
-    if (counts.단백질 >= 3) {
-      alert("⚠️ 고기·생선·콩류 반찬이 너무 많아요!\n단백질만 가득 먹으면 비타민이 부족해져 감기에 걸리기 쉬워요. 🥦 채소와 함께 골고루 담아볼까요?");
+    // 규칙 3: 고기·생선·달걀·콩류 과다 검사 (3개 이상 시 차단)
+    if (proteinCount >= 3) {
+      alert("⚠️ 고기·생선·달걀·콩류 반찬이 너무 많아요!\n단백질만 가득 먹으면 비타민이 부족해져 감기에 걸리기 쉬워요. 🥦 채소와 함께 골고루 담아볼까요?");
       return false;
     }
 
