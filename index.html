@@ -38,7 +38,7 @@
       color: #37474f;
     }
 
-    h1, h2, h3, button, .badge, .tab-btn, .food-chip {
+    h1, h2, h3, button, .badge, .tab-btn, .food-chip, .check-item {
       font-family: 'Jua', sans-serif;
     }
 
@@ -49,7 +49,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     h1 {
@@ -68,14 +68,14 @@
     /* 학생 정보 입력 카드 */
     .student-card {
       background: #ffffff;
-      padding: 12px 15px;
+      padding: 10px 15px;
       border-radius: 18px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
 
@@ -84,13 +84,52 @@
       font-size: 1rem;
       border: 2px solid #ffe0b2;
       border-radius: 10px;
-      padding: 5px 8px;
+      padding: 4px 8px;
       text-align: center;
       outline: none;
     }
 
-    .student-card input:focus {
-      border-color: var(--primary-color);
+    /* 영양 균형 실시간 체크리스트 UI */
+    .checklist-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 2px solid #e0f2f1;
+    }
+
+    .checklist-title {
+      font-size: 1rem;
+      color: #00695c;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 6px;
+    }
+
+    .check-item {
+      font-size: 0.85rem;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: #f5f5f5;
+      color: #9e9e9e;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .check-item.pass {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
     }
 
     /* 스테인리스 식판 스타일 */
@@ -116,7 +155,7 @@
       font-size: 1.2rem;
       color: #37474f;
       margin-bottom: 12px;
-      background: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.85);
       padding: 4px 15px;
       border-radius: 15px;
       display: inline-block;
@@ -133,7 +172,7 @@
       background: #ffffff;
       border: 3px dashed #b0bec5;
       border-radius: 20px;
-      min-height: 100px;
+      min-height: 105px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -172,6 +211,24 @@
       word-break: keep-all;
     }
 
+    .remove-btn {
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      font-size: 0.8rem;
+      color: #ef5350;
+      background: #ffebee;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      display: none;
+    }
+
+    .slot.filled:hover .remove-btn {
+      display: block;
+    }
+
     /* 메뉴 선택 패널 */
     .menu-panel {
       background: #ffffff;
@@ -198,9 +255,6 @@
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
 
     .tab-btn.active {
@@ -209,7 +263,6 @@
       box-shadow: 0 3px 8px rgba(76,175,80,0.3);
     }
 
-    /* 식재료 목록 그리드 */
     .food-grid {
       display: flex;
       flex-wrap: wrap;
@@ -231,7 +284,6 @@
       font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.15s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
     .food-chip:active {
@@ -254,7 +306,6 @@
     .badge-과일류 { background-color: var(--color-fruit); }
     .badge-유제품 { background-color: var(--color-milk); }
 
-    /* 버튼들 */
     .btn-custom {
       background: #fff3e0;
       border: 2px dashed #ffb74d;
@@ -270,7 +321,7 @@
     .submit-btn {
       width: 100%;
       padding: 15px;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: white;
       background: linear-gradient(45deg, #ff7043, #ffa726);
       border: none;
@@ -291,7 +342,7 @@
 <div class="container">
   <header>
     <h1>🍱 영양 만점! 내 마음대로 식판 만들기</h1>
-    <p class="subtitle">채우고 싶은 식판 칸을 먼저 누른 후, 아래에서 음식을 골라주세요!</p>
+    <p class="subtitle">채우고 싶은 식판 칸을 누른 후 음식을 선택하세요!</p>
   </header>
 
   <!-- 학생 정보 입력 -->
@@ -300,6 +351,21 @@
     <input type="number" id="grade" value="5" style="width: 50px;"> 학년
     <input type="number" id="classNum" placeholder="반" style="width: 50px;"> 반
     <input type="text" id="studentName" placeholder="이름" style="width: 100px;">
+  </div>
+
+  <!-- 영양 균형 실시간 체크리스트 -->
+  <div class="checklist-card">
+    <div class="checklist-title">
+      <span>🚥 영양 균형 체크리스트</span>
+      <span style="font-size: 0.8rem; font-family:'Gowun Dodum'; color:#666;">(5가지 항목을 모두 완성하세요!)</span>
+    </div>
+    <div class="checklist-grid">
+      <div class="check-item" id="check-rice">⚪ 🍚 밥 칸에 곡류 담기</div>
+      <div class="check-item" id="check-protein">⚪ 🥩 단백질 적정량(1~2개)</div>
+      <div class="check-item" id="check-veggie">⚪ 🥦 채소류 2가지 이상</div>
+      <div class="check-item" id="check-dessert">⚪ 🍎 과일/유제품 1~2개</div>
+      <div class="check-item" id="check-full">⚪ 🍱 6개 칸 모두 채우기</div>
+    </div>
   </div>
 
   <!-- 식판 영역 -->
@@ -312,30 +378,36 @@
       <div class="plate-grid">
         <!-- 상단 4개 반찬/후식 칸 -->
         <div class="slot active" data-slot-id="side1" onclick="selectSlot(this)">
-          <span class="slot-label">주반찬 (고기·생선)</span>
+          <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
+          <span class="slot-label">주반찬 (고기·생선·콩)</span>
         </div>
         <div class="slot" data-slot-id="side2" onclick="selectSlot(this)">
+          <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
           <span class="slot-label">부반찬 1 (채소류)</span>
         </div>
         <div class="slot" data-slot-id="side3" onclick="selectSlot(this)">
+          <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
           <span class="slot-label">부반찬 2 (채소류)</span>
         </div>
         <div class="slot" data-slot-id="dessert" onclick="selectSlot(this)">
+          <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
           <span class="slot-label">후식 (과일/유제품)</span>
         </div>
 
         <!-- 하단 2개 밥/국 칸 -->
         <div class="slot main-rice" data-slot-id="rice" onclick="selectSlot(this)">
-          <span class="slot-label">밥 칸 (곡류)</span>
+          <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
+          <span class="slot-label">밥 칸 (곡류만 가능)</span>
         </div>
         <div class="slot main-soup" data-slot-id="soup" onclick="selectSlot(this)">
+          <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
           <span class="slot-label">국 / 찌개 칸</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 음식 가져오기 카탈로그 패널 -->
+  <!-- 음식 가져오기 패널 -->
   <div class="menu-panel">
     <h3>🥗 음식 가져오기</h3>
     <div class="category-tabs">
@@ -347,7 +419,6 @@
       <button class="tab-btn" onclick="filterCategory('유제품', this)">🥛 우유·유제품</button>
     </div>
 
-    <!-- PDF 기반 식재료 목록이 출력되는 공간 -->
     <div class="food-grid" id="foodGrid"></div>
 
     <button class="btn-custom" onclick="addCustomFood()">
@@ -361,43 +432,35 @@
 </div>
 
 <script>
-  // 1. PDF(1, 2번)에서 추출한 식품군별 데이터베이스
+  // 1. PDF 기반 식품군 데이터베이스
   const foodDatabase = [
-    // 곡류
     { name: "쌀밥", category: "곡류" }, { name: "현미밥", category: "곡류" },
     { name: "가래떡", category: "곡류" }, { name: "식빵", category: "곡류" },
     { name: "국수", category: "곡류" }, { name: "고구마", category: "곡류" },
     { name: "감자", category: "곡류" }, { name: "시리얼", category: "곡류" },
-    { name: "우동면", category: "곡류" }, { name: "도토리묵", category: "곡류" },
 
-    // 고기·생선·달걀·콩류 (단백질)
     { name: "돼지고기볶음", category: "단백질" }, { name: "쇠고기구이", category: "단백질" },
     { name: "닭갈비", category: "단백질" }, { name: "고등어조림", category: "단백질" },
     { name: "달걀말이", category: "단백질" }, { name: "두부조림", category: "단백질" },
     { name: "오징어볶음", category: "단백질" }, { name: "어묵볶음", category: "단백질" },
-    { name: "새우튀김", category: "단백질" }, { name: "멸치볶음", category: "단백질" },
 
-    // 채소류
     { name: "배추김치", category: "채소류" }, { name: "콩나물무침", category: "채소류" },
     { name: "시금치나물", category: "채소류" }, { name: "오이소박이", category: "채소류" },
     { name: "깍두기", category: "채소류" }, { name: "브로콜리", category: "채소류" },
     { name: "상추쌈", category: "채소류" }, { name: "느타리버섯볶음", category: "채소류" },
-    { name: "양배추샐러드", category: "채소류" }, { name: "김구이", category: "채소류" },
 
-    // 과일류
     { name: "사과", category: "과일류" }, { name: "귤", category: "과일류" },
     { name: "수박", category: "과일류" }, { name: "참외", category: "과일류" },
     { name: "포도", category: "과일류" }, { name: "바나나", category: "과일류" },
-    { name: "딸기", category: "과일류" }, { name: "샤인머스캣", category: "과일류" },
+    { name: "샤인머스캣", category: "과일류" },
 
-    // 우유·유제품류
     { name: "우유", category: "유제품" }, { name: "슬라이스치즈", category: "유제품" },
     { name: "요거트", category: "유제품" }, { name: "아이스크림", category: "유제품" }
   ];
 
   let currentSelectedSlot = document.querySelector('.slot.active');
 
-  // 학생 정보 실시간 동기화
+  // 학생 정보 입력 반영
   document.querySelectorAll('.student-card input').forEach(input => {
     input.addEventListener('input', updateStudentHeader);
   });
@@ -416,7 +479,32 @@
     currentSelectedSlot = element;
   }
 
-  // 카테고리 필터링 및 음식 목록 생성
+  // 칸 비우기
+  function clearSlot(event, btnElement) {
+    event.stopPropagation();
+    const slot = btnElement.parentElement;
+    slot.classList.remove('filled');
+    delete slot.dataset.category;
+    delete slot.dataset.foodName;
+    
+    // 기본 라벨 복원
+    const labels = {
+      rice: '밥 칸 (곡류만 가능)',
+      soup: '국 / 찌개 칸',
+      side1: '주반찬 (고기·생선·콩)',
+      side2: '부반찬 1 (채소류)',
+      side3: '부반찬 2 (채소류)',
+      dessert: '후식 (과일/유제품)'
+    };
+    const slotId = slot.dataset.slotId;
+    slot.innerHTML = `
+      <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
+      <span class="slot-label">${labels[slotId]}</span>
+    `;
+    updateChecklist();
+  }
+
+  // 카테고리 필터링
   function filterCategory(category, tabBtn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     tabBtn.classList.add('active');
@@ -437,22 +525,32 @@
     });
   }
 
-  // 음식을 선택한 식판 칸에 배치
+  // 음식을 선택한 칸에 배치
   function placeFoodToSlot(foodItem) {
     if (!currentSelectedSlot) {
-      alert("음식을 담을 식판 칸을 먼저 눌러서 선택해 주세요!");
+      alert("음식을 담을 식판 칸을 먼저 누른 후 선택해 주세요!");
+      return;
+    }
+
+    // 밥 칸 규칙 검증 (곡류만 허용)
+    if (currentSelectedSlot.dataset.slotId === 'rice' && foodItem.category !== '곡류') {
+      alert("⚠️ 밥 칸에는 우리 몸의 에너지원이 되는 '곡류'(쌀밥, 현미밥, 식빵 등)를 담아주세요!");
       return;
     }
 
     currentSelectedSlot.innerHTML = `
+      <span class="remove-btn" onclick="clearSlot(event, this)">✕</span>
       <span class="badge badge-${foodItem.category}">${foodItem.category}</span>
       <div class="placed-food-name">${foodItem.name}</div>
     `;
+    currentSelectedSlot.classList.add('filled');
     currentSelectedSlot.dataset.category = foodItem.category;
     currentSelectedSlot.dataset.foodName = foodItem.name;
+
+    updateChecklist();
   }
 
-  // 음식을 직접 입력하여 추가
+  // 직접 입력 처리
   function addCustomFood() {
     if (!currentSelectedSlot) {
       alert("음식을 담을 식판 칸을 먼저 선택해 주세요!");
@@ -471,21 +569,96 @@
     placeFoodToSlot({ name: foodName, category: category });
   }
 
-  // 영양 균형 점검 로직
-  function validateNutrition() {
+  // 실시간 영양 체크리스트 업데이트
+  function updateChecklist() {
     const slots = document.querySelectorAll('.slot');
-    let categories = { 곡류: 0, 단백질: 0, 채소류: 0, 과일류: 0, 유제품: 0 };
+    let counts = { 곡류: 0, 단백질: 0, 채소류: 0, 과일류: 0, 유제품: 0 };
+    let filledCount = 0;
+    let isRiceValid = false;
 
     slots.forEach(slot => {
       const cat = slot.dataset.category;
-      if (cat && categories[cat] !== undefined) {
-        categories[cat]++;
+      if (cat) {
+        counts[cat]++;
+        filledCount++;
+      }
+      if (slot.dataset.slotId === 'rice' && cat === '곡류') {
+        isRiceValid = true;
       }
     });
 
-    // 과일류 과다 규칙 거르기
-    if (categories['과일류'] >= 3) {
-      alert("⚠️ 과일류가 너무 많아요! 과일은 하루 권장량에 맞게 1~2칸만 채워볼까요?");
+    // 1. 밥 칸 곡류 여부
+    setCheckState('check-rice', isRiceValid, '🍚 밥 칸에 곡류 담기');
+    // 2. 단백질 적정량 (1~2개)
+    const isProteinValid = (counts.단백질 >= 1 && counts.단백질 <= 2);
+    setCheckState('check-protein', isProteinValid, `🥩 단백질 적정량(1~2개) [현재:${counts.단백질}개]`);
+    // 3. 채소류 2개 이상
+    const isVeggieValid = (counts.채소류 >= 2);
+    setCheckState('check-veggie', isVeggieValid, `🥦 채소류 2가지 이상 [현재:${counts.채소류}개]`);
+    // 4. 후식(과일/유제품 1~2개)
+    const dessertCount = counts.과일류 + counts.유제품;
+    const isDessertValid = (dessertCount >= 1 && dessertCount <= 2);
+    setCheckState('check-dessert', isDessertValid, `🍎 과일/유제품 1~2개 [현재:${dessertCount}개]`);
+    // 5. 6개 칸 모두 채우기
+    setCheckState('check-full', filledCount === 6, `🍱 6개 칸 모두 채우기 [${filledCount}/6]`);
+  }
+
+  function setCheckState(elementId, isPassed, text) {
+    const el = document.getElementById(elementId);
+    if (isPassed) {
+      el.classList.add('pass');
+      el.innerText = '✅ ' + text;
+    } else {
+      el.classList.remove('pass');
+      el.innerText = '⚪ ' + text;
+    }
+  }
+
+  // 최종 영양 검증 및 경고 팝업
+  function validateNutrition() {
+    const slots = document.querySelectorAll('.slot');
+    let counts = { 곡류: 0, 단백질: 0, 채소류: 0, 과일류: 0, 유제품: 0 };
+    let filledCount = 0;
+    let riceCategory = "";
+
+    slots.forEach(slot => {
+      const cat = slot.dataset.category;
+      if (cat) {
+        counts[cat]++;
+        filledCount++;
+      }
+      if (slot.dataset.slotId === 'rice') {
+        riceCategory = cat;
+      }
+    });
+
+    // 규칙 1: 빈 칸 검사
+    if (filledCount < 6) {
+      alert("⚠️ 아직 빈 칸이 남아있어요!\n6개 칸을 모두 맛있는 음식으로 골고루 채워주세요. 🍱");
+      return false;
+    }
+
+    // 규칙 2: 밥 칸 필수 곡류 검사
+    if (riceCategory !== '곡류') {
+      alert("⚠️ 밥 칸에는 우리 몸의 중요한 에너지원이 되는 '곡류'(쌀밥, 현미밥 등)를 담아야 해요! 🌾");
+      return false;
+    }
+
+    // 규칙 3: 단백질 과다 검사 (3개 이상 시 차단)
+    if (counts.단백질 >= 3) {
+      alert("⚠️ 고기·생선·콩류 반찬이 너무 많아요!\n단백질만 가득 먹으면 비타민이 부족해져 감기에 걸리기 쉬워요. 🥦 채소와 함께 골고루 담아볼까요?");
+      return false;
+    }
+
+    // 규칙 4: 채소류 2개 이상 필수 검사
+    if (counts.채소류 < 2) {
+      alert("⚠️ 비타민과 식이섬유가 부족해요!\n몸속 차전을 힘차게 돌리려면 🥦 채소류 반찬(김치, 나물, 샐러드 등)을 최소 2가지 이상 챙겨야 해요.");
+      return false;
+    }
+
+    // 규칙 5: 과일/유제품 과다 검사
+    if (counts.과일류 + counts.유제품 >= 3) {
+      alert("⚠️ 과일이나 유제품이 너무 많아요!\n과일과 우유는 하루 권장량에 맞춰 후식으로 1~2개만 골라주세요. 🍎");
       return false;
     }
 
@@ -500,6 +673,7 @@
       return;
     }
 
+    // 영양 균형 검증 실행
     if (!validateNutrition()) return;
 
     html2canvas(document.getElementById('plate-area'), { scale: 2 }).then(canvas => {
@@ -507,13 +681,15 @@
       link.download = `5학년_${document.getElementById('classNum').value}반_${name}_건강식판.png`;
       link.href = canvas.toDataURL();
       link.click();
+      alert("🎉 영양 균형 통과! 참잘했어요. 식판 이미지가 성공적으로 저장되었습니다.");
     });
   }
 
-  // 초기 시작 시 '전체' 카테고리 렌더링
+  // 초기화
   window.onload = () => {
     filterCategory('전체', document.querySelector('.tab-btn.active'));
     updateStudentHeader();
+    updateChecklist();
   };
 </script>
 
