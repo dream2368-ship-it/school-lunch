@@ -396,7 +396,7 @@
 
     .nutrition-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 10px;
     }
 
@@ -413,9 +413,9 @@
     .nut-card.ok { border-left-color: #22c55e; background-color: #f0fdf4; }
     .nut-card.over { border-left-color: #ef4444; background-color: #fef2f2; }
 
-    .nut-card-name { font-size: 0.75rem; font-weight: 700; color: #64748b; }
-    .nut-card-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 3px 0; }
-    .nut-card-status { font-size: 0.73rem; font-weight: 700; }
+    .nut-card-name { font-size: 0.82rem; font-weight: 800; color: #334155; }
+    .nut-card-val { font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 3px 0; }
+    .nut-card-status { font-size: 0.75rem; font-weight: 700; }
     
     .nut-card-status.warn { color: #ca8a04; }
     .nut-card-status.ok { color: #16a34a; }
@@ -520,7 +520,7 @@
       </div>
 
       <!-- 저장 버튼 (조건 미충족 시 disabled) & 저장 시 전환되는 달성도 배지 -->
-      <div class="action-area">
+      <div class="action-area" id="actionArea" title="6개 칸을 모두 채우고 영양 균형을 맞춰주세요.">
         <button id="btnSaveImage" class="btn-save-image" onclick="exportTrayToImage()" disabled title="6개 칸을 모두 채우고 영양 균형을 맞춰주세요.">
           🔒 식판 이미지로 저장하기
         </button>
@@ -589,14 +589,14 @@
 <div class="modal-overlay" id="celebrateModal">
   <div class="modal-card celebrate">
     <div class="confetti-box">🎉✨🍎🥦🍗🍚✨🎉</div>
-    <div class="badge-hero">🥇 5학년 영양 박사 칭호 획득!</div>
+    <div class="badge-hero">🥇 영양 박사 칭호 획득!</div>
     <div class="modal-title celebrate" id="celebrateTitle">완벽한 영양 균형 달성!</div>
     <div class="modal-desc" id="celebrateDesc">
       축하합니다! 6개 칸을 빈칸 없이 채우고 영양 균형을 완벽하게 맞추었어요! 👏<br>
-      이제 활성화된 버튼을 눌러 식판 이미지를 저장해 보세요.
+      아래 버튼을 눌러 바로 식판 이미지를 저장해 보세요.
     </div>
     <div class="modal-btn-group">
-      <button class="modal-btn modal-btn-save" onclick="closeModal('celebrateModal')">확인 및 저장하기</button>
+      <button class="modal-btn modal-btn-save" onclick="closeModal('celebrateModal'); exportTrayToImage();">확인 및 바로 저장하기</button>
     </div>
   </div>
 </div>
@@ -786,18 +786,19 @@
   let lastAddedInfo = null;
   let hasShownCelebration = false;
 
+  // 구체적인 식품군 이름 및 권장 기준 범위 정의
   const targets = {
-    '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면/떡)' },
-    '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류 (단백질)' },
-    '채소류': { min: 2.0, max: 3.0, label: '채소류 (반찬/국)' },
-    '후식': { min: 1.0, max: 1.0, label: '과일 / 유제품' }
+    '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면/떡)', shortName: '곡류' },
+    '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류 (단백질)', shortName: '단백질' },
+    '채소류': { min: 2.0, max: 3.0, label: '채소류 (반찬/국/김치)', shortName: '채소류' },
+    '후식': { min: 1.0, max: 1.0, label: '과일 / 유제품 (후식)', shortName: '후식' }
   };
 
   window.onload = function() {
     renderTray();
     renderCategoryTabs();
     renderFoodGrid();
-    renderNutritionDashboard(); // 초기 비활성화 상태 적용
+    renderNutritionDashboard();
     updateSlotIndicator();
   };
 
@@ -1054,7 +1055,7 @@
     });
   }
 
-  /* 📊 실시간 영양 대시보드 및 식판 6칸 빈칸 검사 로직 */
+  /* 📊 실시간 영양 대시보드, 식품군 상태 명시 & 식판 6칸 검사 로직 */
   function renderNutritionDashboard() {
     const totals = calculateTotals();
     const container = document.getElementById('nutritionGrid');
@@ -1062,6 +1063,8 @@
 
     let allOkCount = 0;
     const totalCategories = Object.keys(targets).length;
+    let missingCategories = [];
+    let overCategories = [];
 
     Object.keys(targets).forEach(key => {
       const val = totals[key];
@@ -1069,17 +1072,25 @@
       
       let statusText = '';
       let statusClass = ''; 
+      let guideText = '';
 
       const targetRangeText = (target.min === target.max) ? `${target.min}회` : `${target.min}~${target.max}회`;
 
       if (val < target.min) {
-        statusText = `⚠️ 부족 (${targetRangeText} 권장)`;
+        const diff = (target.min - val).toFixed(1).replace('.0', '');
+        statusText = `⚠️ 부족 (권장 ${targetRangeText} / 현재 ${val}회)`;
+        guideText = `💡 ${diff}회 분량 더 필요`;
         statusClass = 'warn'; 
+        missingCategories.push(target.shortName);
       } else if (val > target.max) {
-        statusText = `⚡ 초과 (${targetRangeText} 권장 - 현재 ${val}회)`;
+        const diff = (val - target.max).toFixed(1).replace('.0', '');
+        statusText = `⚡ 초과 (권장 ${targetRangeText} / 현재 ${val}회)`;
+        guideText = `🚨 ${diff}회 분량 줄이기 필요`;
         statusClass = 'over'; 
+        overCategories.push(target.shortName);
       } else {
-        statusText = `✅ 적정 (${val}회 담김)`;
+        statusText = `✅ 적정 (권장 ${targetRangeText} / 현재 ${val}회)`;
+        guideText = `✨ 완벽한 권장 분량!`;
         statusClass = 'ok'; 
         allOkCount++;
       }
@@ -1090,24 +1101,28 @@
         <div class="nut-card-name">${target.label}</div>
         <div class="nut-card-val">${val}회</div>
         <div class="nut-card-status ${statusClass}">${statusText}</div>
+        <div style="font-size: 0.72rem; color: #64748b; margin-top: 4px; font-weight: 600;">${guideText}</div>
       `;
       container.appendChild(card);
     });
 
-    // 🎯 두 가지 필수 통과 조건 검사:
-    // 조건 1. 6개 식판 칸 모두 최소 1개 이상의 식재료가 채워져 있어야 함
-    const is6SlotsFilled = slots.every(slot => slot.ingredients.length > 0);
-    // 조건 2. 영양 균형 체크리스트 4개 항목이 전부 초록색(적정)이어야 함
+    // 🎯 두 가지 필수 통과 조건 검사
+    const filledSlotsCount = slots.filter(slot => slot.ingredients.length > 0).length;
+    const is6SlotsFilled = filledSlotsCount === 6;
     const isAllNutritionOk = (allOkCount === totalCategories);
 
     const saveBtn = document.getElementById('btnSaveImage');
+    const actionArea = document.getElementById('actionArea');
 
     if (is6SlotsFilled && isAllNutritionOk) {
-      // ✅ 6칸 모두 완충 + 영양 균형 ALL 적정 시 저장 버튼 활성화 & 팝업 실행
+      // ✅ 6칸 완충 + 영양 균형 ALL 적정 시 저장 버튼 활성화
       saveBtn.disabled = false;
       saveBtn.innerHTML = '📸 식판 이미지로 저장하기';
       saveBtn.classList.add('active-pulse');
-      saveBtn.removeAttribute('title');
+      
+      const successTooltip = '✨ 영양 균형 완벽 달성! 클릭하여 식판 이미지를 저장하세요.';
+      saveBtn.setAttribute('title', successTooltip);
+      if (actionArea) actionArea.setAttribute('title', successTooltip);
 
       if (!hasShownCelebration) {
         hasShownCelebration = true;
@@ -1118,34 +1133,38 @@
         document.getElementById('celebrateDesc').innerHTML = `
           <strong>${grade}학년 ${className}반 ${name} 학생!</strong><br>
           6개 식판 칸을 모두 빈칸 없이 채우고 영양 균형을 완벽하게 맞추었어요! 👏<br>
-          상단 우측의 활성화된 <strong>[식판 이미지로 저장하기]</strong> 버튼을 눌러 제출해 보세요!
+          아래 버튼을 눌러 바로 식판 이미지를 다운로드해 보세요!
         `;
         showModal('celebrateModal');
       }
 
     } else {
-      // 🔒 하나라도 조건 미달 시 버튼 비활성화 (disabled)
+      // 🔒 조건 미달 시 버튼 비활성화 (disabled) 및 구체적 툴팁 사유 제공
       saveBtn.disabled = true;
       saveBtn.classList.remove('active-pulse');
       saveBtn.innerHTML = '🔒 식판 이미지로 저장하기';
 
-      // 마우스 오버 시 툴팁 안내 사유 설정
-      let reason = '';
-      if (!is6SlotsFilled && !isAllNutritionOk) {
-        reason = '6개 칸을 모두 채우고 영양 균형(체크리스트)을 맞춰주세요.';
-      } else if (!is6SlotsFilled) {
-        reason = '빈 식판 칸이 있습니다. 6개 칸에 최소 1개 이상의 식재료를 채워주세요.';
-      } else {
-        reason = '영양 균형 체크리스트를 모두 초록색(적정)으로 맞춰주세요.';
+      let reasonLines = [];
+      if (!is6SlotsFilled) {
+        reasonLines.push(`• 빈 식판 칸 존재 (${filledSlotsCount}/6칸 채움)`);
       }
-      saveBtn.setAttribute('title', reason);
+      if (missingCategories.length > 0) {
+        reasonLines.push(`• 영양 부족 항목: ${missingCategories.join(', ')}`);
+      }
+      if (overCategories.length > 0) {
+        reasonLines.push(`• 영양 초과 항목: ${overCategories.join(', ')}`);
+      }
 
-      // 완벽 달성 상태에서 식재료 수정으로 조건이 깨지면 플래그 리셋 (다시 달성 시 팝업 노출)
+      const tooltipText = `🔒 이미지를 저장하려면 아래 항목을 맞춰주세요:\n` + reasonLines.join('\n');
+      saveBtn.setAttribute('title', tooltipText);
+      if (actionArea) actionArea.setAttribute('title', tooltipText);
+
+      // 수정 중 조건이 풀리면 플래그 리셋
       hasShownCelebration = false;
     }
   }
 
-  /* 📸 식판 이미지 저장 함수 */
+  /* 📸 식판 이미지 저장 함수 (버튼 클릭 핸들러) */
   async function exportTrayToImage() {
     const saveBtn = document.getElementById('btnSaveImage');
     if (saveBtn.disabled) return;
@@ -1159,25 +1178,33 @@
 
     const filename = `${grade}학년_${className}반_${name}_영양식판.png`;
 
+    // 1. UI 저장 모드 전환 (버튼 숨기고 배지 노출)
     saveBtn.style.display = 'none';
     if (scoreBadge) scoreBadge.style.display = 'inline-flex';
     trayElement.classList.add('export-mode');
 
+    // 2. DOM 클래스 반영을 보장하기 위한 미세 비동기 딜레이
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     try {
+      // 3. html2canvas로 캡처
       const canvas = await html2canvas(trayElement, {
         scale: 2,
         backgroundColor: '#f1f5f9',
-        useCORS: true
+        useCORS: true,
+        logging: false
       });
 
+      // 4. 이미지 다운로드 트리거
       const link = document.createElement('a');
       link.download = filename;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
       console.error("식판 이미지 저장 오류:", err);
-      alert("이미지 저장 중 오류가 발생했습니다.");
+      alert("이미지 저장 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
+      // 5. UI 원상 복구
       saveBtn.style.display = 'inline-flex';
       if (scoreBadge) scoreBadge.style.display = 'none';
       trayElement.classList.remove('export-mode');
