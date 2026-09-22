@@ -770,7 +770,7 @@
     { id: 157, category: '후식', name: '치즈', weight: 20, unit: 'g' }
   ];
 
-  // 식판 6칸 초기 상태 (기본 빈 상태로 시작)
+  // 식판 6칸 초기 상태
   let slots = [
     { defaultLabel: '주반찬 (단백질)', menuName: '', ingredients: [] },
     { defaultLabel: '부반찬 1 (채소류)', menuName: '', ingredients: [] },
@@ -797,7 +797,7 @@
     renderTray();
     renderCategoryTabs();
     renderFoodGrid();
-    renderNutritionDashboard();
+    renderNutritionDashboard(); // 초기 비활성화 상태 적용
     updateSlotIndicator();
   };
 
@@ -1054,7 +1054,7 @@
     });
   }
 
-  /* 📊 실시간 영양 대시보드 검사 및 버튼 활성화 / 팝업 제어 로직 */
+  /* 📊 실시간 영양 대시보드 및 식판 6칸 빈칸 검사 로직 */
   function renderNutritionDashboard() {
     const totals = calculateTotals();
     const container = document.getElementById('nutritionGrid');
@@ -1094,24 +1094,21 @@
       container.appendChild(card);
     });
 
-    // 🎯 핵심 요구 조건 체크:
-    // 조건 1. 6개 칸 모두 빈칸 없이 식재료가 1개 이상 담김
+    // 🎯 두 가지 필수 통과 조건 검사:
+    // 조건 1. 6개 식판 칸 모두 최소 1개 이상의 식재료가 채워져 있어야 함
     const is6SlotsFilled = slots.every(slot => slot.ingredients.length > 0);
-    // 조건 2. 전체 체크리스트 항목이 전부 초록색(적정)
+    // 조건 2. 영양 균형 체크리스트 4개 항목이 전부 초록색(적정)이어야 함
     const isAllNutritionOk = (allOkCount === totalCategories);
 
     const saveBtn = document.getElementById('btnSaveImage');
 
     if (is6SlotsFilled && isAllNutritionOk) {
-      // ✅ 두 조건이 모두 충족되었을 때
-      if (saveBtn.disabled) {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '📸 식판 이미지로 저장하기';
-        saveBtn.classList.add('active-pulse');
-        saveBtn.removeAttribute('title');
-      }
+      // ✅ 6칸 모두 완충 + 영양 균형 ALL 적정 시 저장 버튼 활성화 & 팝업 실행
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '📸 식판 이미지로 저장하기';
+      saveBtn.classList.add('active-pulse');
+      saveBtn.removeAttribute('title');
 
-      // 팝업이 아직 실행되지 않았다면 1회 노출
       if (!hasShownCelebration) {
         hasShownCelebration = true;
         const grade = document.getElementById('gradeInput').value || '5';
@@ -1127,21 +1124,31 @@
       }
 
     } else {
-      // 🔒 조건 미달 시 다시 비활성화 처리
+      // 🔒 하나라도 조건 미달 시 버튼 비활성화 (disabled)
       saveBtn.disabled = true;
-      saveBtn.innerHTML = '🔒 식판 이미지로 저장하기';
       saveBtn.classList.remove('active-pulse');
-      saveBtn.setAttribute('title', '6개 칸을 모두 채우고 영양 균형을 맞춰주세요.');
-      
-      // 완벽 달성이 깨지면 다시 완성했을 때 팝업이 뜰 수 있도록 플래그 리셋
+      saveBtn.innerHTML = '🔒 식판 이미지로 저장하기';
+
+      // 마우스 오버 시 툴팁 안내 사유 설정
+      let reason = '';
+      if (!is6SlotsFilled && !isAllNutritionOk) {
+        reason = '6개 칸을 모두 채우고 영양 균형(체크리스트)을 맞춰주세요.';
+      } else if (!is6SlotsFilled) {
+        reason = '빈 식판 칸이 있습니다. 6개 칸에 최소 1개 이상의 식재료를 채워주세요.';
+      } else {
+        reason = '영양 균형 체크리스트를 모두 초록색(적정)으로 맞춰주세요.';
+      }
+      saveBtn.setAttribute('title', reason);
+
+      // 완벽 달성 상태에서 식재료 수정으로 조건이 깨지면 플래그 리셋 (다시 달성 시 팝업 노출)
       hasShownCelebration = false;
     }
   }
 
-  /* 📸 식판 이미지 저장 함수 (버튼 ↔ 달성도 배지 전환) */
+  /* 📸 식판 이미지 저장 함수 */
   async function exportTrayToImage() {
     const saveBtn = document.getElementById('btnSaveImage');
-    if (saveBtn.disabled) return; // 미완성 상태 클릭 방지
+    if (saveBtn.disabled) return;
 
     const trayElement = document.getElementById('trayFrame');
     const scoreBadge = document.getElementById('exportScoreBadge');
@@ -1152,14 +1159,13 @@
 
     const filename = `${grade}학년_${className}반_${name}_영양식판.png`;
 
-    // 1. 저장 전용 UI 모드로 일시 전환 (버튼 숨기고 ⭐5개 배지 노출 + 밑줄 제거)
     saveBtn.style.display = 'none';
     if (scoreBadge) scoreBadge.style.display = 'inline-flex';
     trayElement.classList.add('export-mode');
 
     try {
       const canvas = await html2canvas(trayElement, {
-        scale: 2, // 고해상도 출력
+        scale: 2,
         backgroundColor: '#f1f5f9',
         useCORS: true
       });
@@ -1172,7 +1178,6 @@
       console.error("식판 이미지 저장 오류:", err);
       alert("이미지 저장 중 오류가 발생했습니다.");
     } finally {
-      // 2. 원래 웹 화면 상태로 복원
       saveBtn.style.display = 'inline-flex';
       if (scoreBadge) scoreBadge.style.display = 'none';
       trayElement.classList.remove('export-mode');
