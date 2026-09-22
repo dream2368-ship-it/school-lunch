@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>균형잡힌 식단 만들기</title>
+  <!-- html2canvas 라이브러리 (식판 이미지 저장용) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
     body { background-color: #f1f5f9; color: #334155; padding: 24px 16px; display: flex; justify-content: center; min-height: 100vh; }
@@ -20,15 +22,23 @@
       position: relative;
     }
 
+    /* 상단 컨트롤 바 (이미지 저장 버튼 포함) */
+    .tray-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
     /* 상단 타이틀 */
     .tray-header {
       background: #ffffff;
       border-radius: 20px;
-      padding: 12px 28px;
-      width: fit-content;
-      margin: 0 auto 24px auto;
+      padding: 10px 24px;
       font-weight: 800;
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       color: #0f172a;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       display: flex;
@@ -41,7 +51,7 @@
       border-bottom: 2px solid #94a3b8;
       background: transparent;
       font-weight: 800;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       color: #0f172a;
       text-align: center;
       outline: none;
@@ -50,6 +60,28 @@
     }
     .header-input.name-input { width: 75px; }
     .header-input:focus { border-bottom-color: #f97316; }
+
+    /* 이미지 저장 버튼 */
+    .btn-save-image {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: all 0.2s ease;
+    }
+    .btn-save-image:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
 
     /* 식판 6칸 그리드 */
     .tray-grid {
@@ -260,7 +292,7 @@
     .food-item-btn .name { font-weight: 700; font-size: 0.85rem; color: #1e293b; }
     .food-item-btn .weight { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
 
-    /* 실시간 영양 균형 대시보드 및 색상 스타일 정의 */
+    /* 실시간 영양 균형 대시보드 */
     .nutrition-section {
       background-color: #f8fafc;
       border-radius: 16px;
@@ -280,36 +312,124 @@
       background-color: #ffffff;
       border-radius: 12px;
       padding: 12px 14px;
-      border-left: 5px solid #cbd5e1;
+      border-left: 6px solid #cbd5e1;
       box-shadow: 0 1px 3px rgba(0,0,0,0.03);
       transition: all 0.2s;
     }
 
-    /* 부족 (노랑색) */
     .nut-card.warn { border-left-color: #eab308; background-color: #fefce8; }
-    /* 적정 (초록색) */
     .nut-card.ok { border-left-color: #22c55e; background-color: #f0fdf4; }
-    /* 초과 (빨강색) */
     .nut-card.over { border-left-color: #ef4444; background-color: #fef2f2; }
 
     .nut-card-name { font-size: 0.75rem; font-weight: 700; color: #64748b; }
     .nut-card-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 3px 0; }
     .nut-card-status { font-size: 0.73rem; font-weight: 700; }
+    
     .nut-card-status.warn { color: #ca8a04; }
     .nut-card-status.ok { color: #16a34a; }
-    .nut-card-status.over { color: #dc2626; }
+    .nut-card-status.over { color: #dc2626; font-weight: 800; }
+
+    /* 공통 모달 팝업 스타일 */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-overlay.show .modal-card { transform: translateY(0); }
+
+    .modal-card.exceed { border-top: 6px solid #ef4444; }
+    .modal-card.celebrate { border-top: 6px solid #22c55e; background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%); }
+
+    .modal-icon { font-size: 3rem; margin-bottom: 8px; }
+    .modal-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; }
+    .modal-title.exceed { color: #991b1b; }
+    .modal-title.celebrate { color: #15803d; }
+
+    .modal-desc { font-size: 0.92rem; color: #334155; line-height: 1.5; margin-bottom: 22px; }
+
+    .badge-hero {
+      display: inline-block;
+      background: #fef08a;
+      border: 2px dashed #ca8a04;
+      color: #854d0e;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+    }
+
+    .modal-btn-group { display: flex; gap: 10px; justify-content: center; }
+
+    .modal-btn {
+      padding: 11px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .modal-btn-undo { background-color: #fee2e2; color: #991b1b; }
+    .modal-btn-undo:hover { background-color: #fecaca; }
+    .modal-btn-confirm { background-color: #0f172a; color: #ffffff; }
+    .modal-btn-confirm:hover { background-color: #334155; }
+
+    .modal-btn-save { background-color: #16a34a; color: #ffffff; box-shadow: 0 4px 10px rgba(22,163,74,0.3); }
+    .modal-btn-save:hover { background-color: #15803d; }
+
+    /* 폭죽 애니메이션 아이콘 표현 */
+    .confetti-box {
+      font-size: 1.8rem;
+      letter-spacing: 6px;
+      margin-bottom: 6px;
+      animation: bounce 1s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
   </style>
 </head>
 <body>
 
 <div class="app-container">
   <!-- 식판 영역 -->
-  <div class="tray-frame">
-    <div class="tray-header">
-      🍱 균형잡힌 식단 만들기 
-      (<input type="number" id="gradeInput" class="header-input" value="5" min="1" max="6">학년 
-      <input type="number" id="classInput" class="header-input" value="1" min="1" max="20">반 
-      <input type="text" id="nameInput" class="header-input name-input" value="김민준" placeholder="이름">)
+  <div class="tray-frame" id="trayFrame">
+    <div class="tray-top-bar">
+      <div class="tray-header">
+        🍱 균형잡힌 식단 만들기 
+        (<input type="number" id="gradeInput" class="header-input" value="5" min="1" max="6">학년 
+        <input type="number" id="classInput" class="header-input" value="1" min="1" max="20">반 
+        <input type="text" id="nameInput" class="header-input name-input" value="김민준" placeholder="이름">)
+      </div>
+
+      <button class="btn-save-image" onclick="exportTrayToImage()">
+        📸 식판 이미지로 저장하기
+      </button>
     </div>
     
     <div class="tray-grid" id="trayGrid"></div>
@@ -336,6 +456,35 @@
     <div class="nutrition-section">
       <div class="nutrition-title">📊 전체 식판 영양 균형 체크리스트 (통합 회수 집계)</div>
       <div class="nutrition-grid" id="nutritionGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 초과 경고 모달 팝업 -->
+<div class="modal-overlay" id="exceedModal">
+  <div class="modal-card exceed">
+    <div class="modal-icon">🚨</div>
+    <div class="modal-title exceed" id="exceedTitle">권장량 초과 경고</div>
+    <div class="modal-desc" id="exceedDesc">내용</div>
+    <div class="modal-btn-group">
+      <button class="modal-btn modal-btn-undo" onclick="undoLastAdd()">담기 취소</button>
+      <button class="modal-btn modal-btn-confirm" onclick="closeModal('exceedModal')">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 초등학교 5학년 축하 모달 팝업 -->
+<div class="modal-overlay" id="celebrateModal">
+  <div class="modal-card celebrate">
+    <div class="confetti-box">🎉✨🍎🥦🍗🍚✨🎉</div>
+    <div class="badge-hero">🥇 5학년 영양 박사 칭호 획득!</div>
+    <div class="modal-title celebrate" id="celebrateTitle">완벽한 영양 균형 달성!</div>
+    <div class="modal-desc" id="celebrateDesc">
+      축하합니다! 곡류, 단백질, 채소류, 과일·유제품을 모두 완벽하게 맞추었어요! 훌륭해요 👍
+    </div>
+    <div class="modal-btn-group">
+      <button class="modal-btn modal-btn-save" onclick="exportTrayToImage(); closeModal('celebrateModal');">📸 식판 저장하기</button>
+      <button class="modal-btn modal-btn-confirm" onclick="closeModal('celebrateModal')">확인</button>
     </div>
   </div>
 </div>
@@ -484,7 +633,7 @@
     { id: 135, category: '채소류', name: '팽이버섯', weight: 30, unit: 'g' },
     { id: 136, category: '채소류', name: '새송이버섯', weight: 30, unit: 'g' },
 
-    // 4. 과일류 (50 kcal) 및 우유·유제품류 (125 kcal)
+    // 4. 과일류 및 우유·유제품류 (후식)
     { id: 137, category: '후식', name: '수박', weight: 150, unit: 'g' },
     { id: 138, category: '후식', name: '참외', weight: 150, unit: 'g' },
     { id: 139, category: '후식', name: '딸기', weight: 150, unit: 'g' },
@@ -526,9 +675,18 @@
     }
   ];
 
-  let activeSlotIndex = 4;
+  let activeSlotIndex = 0;
   let currentServing = 1.0;
   let currentCategory = '전체';
+  let lastAddedInfo = null;
+  let hasShownCelebration = false; // 중복 팝업 방지용 플래그
+
+  const targets = {
+    '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면/떡)' },
+    '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류 (단백질)' },
+    '채소류': { min: 2.0, max: 3.0, label: '채소류 (반찬/국)' },
+    '후식': { min: 1.0, max: 1.0, label: '과일 / 유제품' }
+  };
 
   window.onload = function() {
     renderTray();
@@ -541,6 +699,18 @@
   function getCalculatedWeight(baseWeight, serving) {
     const val = baseWeight * serving;
     return Number.isInteger(val) ? val : val.toFixed(1);
+  }
+
+  function calculateTotals() {
+    const totals = { '곡류': 0, '단백질': 0, '채소류': 0, '후식': 0 };
+    slots.forEach(slot => {
+      slot.ingredients.forEach(ing => {
+        if (totals[ing.category] !== undefined) {
+          totals[ing.category] += ing.serving;
+        }
+      });
+    });
+    return totals;
   }
 
   function renderTray() {
@@ -620,13 +790,16 @@
     const ing = slots[sIdx].ingredients[iIdx];
     ing.serving = ing.serving === 1.0 ? 0.5 : 1.0;
     ing.weight = getCalculatedWeight(ing.baseWeight, ing.serving);
+    
     renderTray();
     renderNutritionDashboard();
+    checkExceedWarning(ing.category);
   }
 
   function removeIngredient(sIdx, iIdx, event) {
     event.stopPropagation();
     slots[sIdx].ingredients.splice(iIdx, 1);
+    hasShownCelebration = false; // 항목 변경 시 축하 재체크 가능
     renderTray();
     renderNutritionDashboard();
   }
@@ -639,7 +812,7 @@
 
     const calculatedWeight = getCalculatedWeight(food.weight, currentServing);
 
-    slots[activeSlotIndex].ingredients.push({
+    const newIng = {
       foodId: food.id,
       name: food.name,
       category: food.category,
@@ -647,10 +820,60 @@
       weight: calculatedWeight,
       baseWeight: food.weight,
       unit: food.unit
-    });
+    };
+
+    slots[activeSlotIndex].ingredients.push(newIng);
+    lastAddedInfo = { slotIndex: activeSlotIndex, ingredient: newIng };
 
     renderTray();
     renderNutritionDashboard();
+
+    checkExceedWarning(food.category);
+  }
+
+  /* 초과 경고 체크 */
+  function checkExceedWarning(category) {
+    const totals = calculateTotals();
+    const target = targets[category];
+
+    if (target && totals[category] > target.max) {
+      const displayLabel = target.label;
+      const currentVal = totals[category];
+      const maxVal = target.max;
+
+      showModal('exceedModal',
+        '⚠️ 권장 분량 초과 경고',
+        `<strong>[${displayLabel}]</strong>의 권장 분량(최대 ${maxVal}회)을 초과했습니다!<br>현재 총 <strong>${currentVal}회</strong> 담겼습니다. 메뉴를 조정해 주세요.`
+      );
+    }
+  }
+
+  /* 모달 표시/닫기 */
+  function showModal(modalId, title, desc) {
+    if (modalId === 'exceedModal') {
+      document.getElementById('exceedTitle').innerHTML = title;
+      document.getElementById('exceedDesc').innerHTML = desc;
+    }
+    document.getElementById(modalId).classList.add('show');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+  }
+
+  function undoLastAdd() {
+    if (lastAddedInfo) {
+      const { slotIndex, ingredient } = lastAddedInfo;
+      const idx = slots[slotIndex].ingredients.lastIndexOf(ingredient);
+      if (idx !== -1) {
+        slots[slotIndex].ingredients.splice(idx, 1);
+      }
+      lastAddedInfo = null;
+      hasShownCelebration = false;
+      renderTray();
+      renderNutritionDashboard();
+    }
+    closeModal('exceedModal');
   }
 
   function renderCategoryTabs() {
@@ -699,47 +922,34 @@
     });
   }
 
-  /* 업데이트된 영양 균형 집계 및 3색 상태 평가 로직 */
+  /* 영양 체크리스트 평가 및 5학년 전체 초록색 축하 팝업 검사 */
   function renderNutritionDashboard() {
-    const totals = { '곡류': 0, '단백질': 0, '채소류': 0, '후식': 0 };
-
-    slots.forEach(slot => {
-      slot.ingredients.forEach(ing => {
-        if (totals[ing.category] !== undefined) {
-          totals[ing.category] += ing.serving;
-        }
-      });
-    });
-
-    // 설정된 목표 권장 기준
-    const targets = {
-      '곡류': { min: 1.0, max: 1.5, label: '곡류 (밥/면/떡)' },
-      '단백질': { min: 1.0, max: 1.5, label: '고기·생선·달걀·콩류 (단백질)' },
-      '채소류': { min: 2.0, max: 3.0, label: '채소류 (반찬/국)' },
-      '후식': { min: 1.0, max: 1.0, label: '과일 / 유제품' }
-    };
-
+    const totals = calculateTotals();
     const container = document.getElementById('nutritionGrid');
     container.innerHTML = '';
+
+    let allOkCount = 0;
+    const totalCategories = Object.keys(targets).length;
 
     Object.keys(targets).forEach(key => {
       const val = totals[key];
       const target = targets[key];
       
       let statusText = '';
-      let statusClass = ''; // 'warn' (노랑), 'ok' (초록), 'over' (빨강)
+      let statusClass = ''; 
 
       const targetRangeText = (target.min === target.max) ? `${target.min}회` : `${target.min}~${target.max}회`;
 
       if (val < target.min) {
         statusText = `⚠️ 부족 (${targetRangeText} 권장)`;
-        statusClass = 'warn'; // 노랑색
+        statusClass = 'warn'; 
       } else if (val > target.max) {
-        statusText = `⚡ 초과 (${targetRangeText} 권장)`;
-        statusClass = 'over'; // 빨강색
+        statusText = `⚡ 초과 (${targetRangeText} 권장 - 현재 ${val}회)`;
+        statusClass = 'over'; 
       } else {
-        statusText = `✅ 적정 (${val}회)`;
-        statusClass = 'ok'; // 초록색
+        statusText = `✅ 적정 (${val}회 담김)`;
+        statusClass = 'ok'; 
+        allOkCount++;
       }
 
       const card = document.createElement('div');
@@ -750,6 +960,44 @@
         <div class="nut-card-status ${statusClass}">${statusText}</div>
       `;
       container.appendChild(card);
+    });
+
+    // 모든 영양 요소가 '적정(초록색)'을 달성하면 5학년 맞춤 축하 팝업 출력
+    if (allOkCount === totalCategories && !hasShownCelebration) {
+      hasShownCelebration = true;
+      const grade = document.getElementById('gradeInput').value || '5';
+      const className = document.getElementById('classInput').value || '1';
+      const name = document.getElementById('nameInput').value || '학생';
+
+      document.getElementById('celebrateDesc').innerHTML = `
+        <strong>${grade}학년 ${className}반 ${name} 학생!</strong><br>
+        곡류, 단백질, 채소류, 과일·유제품을 완벽하게 맞추어 맛과 건강을 모두 챙겼어요!<br>참 잘했어요 🎉
+      `;
+      showModal('celebrateModal');
+    }
+  }
+
+  /* 식판을 이미지(PNG)로 저장하는 함수 (html2canvas) */
+  function exportTrayToImage() {
+    const trayElement = document.getElementById('trayFrame');
+    const grade = document.getElementById('gradeInput').value || '5';
+    const className = document.getElementById('classInput').value || '1';
+    const name = document.getElementById('nameInput').value || '학생';
+
+    const filename = `${grade}학년_${className}반_${name}_영양식판.png`;
+
+    html2canvas(trayElement, {
+      scale: 2, // 고화질 렌더링
+      backgroundColor: '#f1f5f9',
+      useCORS: true
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }).catch(err => {
+      console.error("식판 이미지 저장 오류:", err);
+      alert("이미지 저장 중 오류가 발생했습니다.");
     });
   }
 </script>
